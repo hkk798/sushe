@@ -31,4 +31,7 @@ public interface BuildingMapper {
     // 删除楼栋 (逻辑删除或物理删除，这里演示物理删除)
     @Delete("DELETE FROM Building WHERE building_id = #{id}")
     int deleteById(Integer id);
+
+    @Select("SELECT COUNT(*) FROM Building")
+    int countAll();
 }

@@ -222,4 +222,9 @@ public interface UserMapper {
         @Result(property = "user.realName", column = "real_name")
     })
     List<Admin> findAdminsByType(@Param("adminType") String adminType);
+
+
+    // 在 UserMapper 接口中添加
+    @Select("SELECT COUNT(*) FROM User")
+    int countAll();
 }

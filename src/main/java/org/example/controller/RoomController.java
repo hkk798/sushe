@@ -4,9 +4,13 @@ import org.example.entity.Building;
 import org.example.entity.Room;
 import org.example.service.BuildingService;
 import org.example.service.RoomService;
+import org.example.service.SystemLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import org.example.entity.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +24,9 @@ public class RoomController {
 
     @Autowired
     private BuildingService buildingService; // 需要注入楼栋服务，用于下拉框
+
+    @Autowired
+    private SystemLogService systemLogService;
 
     // 1. 房间列表
     @GetMapping("/list")
@@ -65,15 +72,41 @@ public class RoomController {
 
     // 3. 保存
     @PostMapping("/save")
-    public String save(Room room) {
+    public String save(Room room, HttpSession session, HttpServletRequest request) {
+        String actionType = (room.getRoomId() == null) ? "新增房间" : "编辑房间";
+
         roomService.saveRoom(room);
+
+        // [新增] 日志
+        User admin = (User) session.getAttribute("currentUser");
+        String operator = (admin != null) ? admin.getUsername() : "Unknown";
+
+        systemLogService.recordLog(
+                operator,
+                actionType,
+                "保存房间: " + room.getRoomNo(),// 建议拼接更多信息如楼栋ID
+                request.getRemoteAddr()
+        );
+
         return "redirect:/admin/room/list";
     }
 
     // 4. 删除
     @GetMapping("/delete")
-    public String delete(@RequestParam Integer id) {
+    public String delete(@RequestParam Integer id, HttpSession session, HttpServletRequest request) {
         roomService.deleteRoom(id);
+
+        // [新增] 日志
+        User admin = (User) session.getAttribute("currentUser");
+        String operator = (admin != null) ? admin.getUsername() : "Unknown";
+
+        systemLogService.recordLog(
+                operator,
+                "删除房间",
+                "删除了房间 ID: " + id,
+                request.getRemoteAddr()
+        );
+
         return "redirect:/admin/room/list";
     }
 }

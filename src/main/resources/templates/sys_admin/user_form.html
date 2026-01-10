@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加用户 - 系统管理</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        // 根据角色切换表单显示
+        function toggleFields() {
+            const role = document.getElementById("roleSelect").value;
+            const studentFields = document.getElementById("studentFields");
+            const adminFields = document.getElementById("adminFields");
+
+            if (role === "student") {
+                studentFields.style.display = "block";
+                adminFields.style.display = "none";
+            } else {
+                studentFields.style.display = "none";
+                adminFields.style.display = "block";
+            }
+        }
+    </script>
+</head>
+<body class="bg-light">
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-user-plus me-2"></i>添加新用户</h4>
+                </div>
+                <div class="card-body">
+                    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+                    <form action="/admin/user/add" method="post">
+                        <h5 class="mb-3 text-secondary border-bottom pb-2">基本账号信息</h5>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">用户名 (登录账号) *</label>
+                                <input type="text" name="username" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">密码 *</label>
+                                <input type="password" name="password" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">真实姓名 *</label>
+                                <input type="text" name="realName" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">用户角色 *</label>
+                                <select name="role" id="roleSelect" class="form-select" onchange="toggleFields()" required>
+                                    <option value="student">学生</option>
+                                    <option value="building_admin">宿舍管理员</option>
+                                    <option value="system_admin">系统管理员</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">联系电话</label>
+                                <input type="text" name="phone" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">电子邮箱</label>
+                                <input type="email" name="email" class="form-control">
+                            </div>
+                        </div>
+
+                        <div id="studentFields">
+                            <h5 class="mb-3 text-secondary border-bottom pb-2">学生详细信息</h5>
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">学号 *</label>
+                                    <input type="text" name="studentNo" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">专业</label>
+                                    <input type="text" name="major" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">班级</label>
+                                    <input type="text" name="className" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="adminFields" style="display: none;">
+                            <h5 class="mb-3 text-secondary border-bottom pb-2">管理员详细信息</h5>
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">工号 *</label>
+                                    <input type="text" name="adminNo" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">职位</label>
+                                    <input type="text" name="position" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="/sys_admin_index" class="btn btn-secondary">返回主页</a>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> 保存用户</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

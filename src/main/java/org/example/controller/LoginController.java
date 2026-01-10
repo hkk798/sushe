@@ -4,7 +4,9 @@ import org.example.entity.User;
 import org.example.entity.Student;
 import org.example.entity.Admin;
 import org.example.service.UserService;
+import org.example.service.SystemLogService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
@@ -26,6 +28,9 @@ public class LoginController {
     
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private SystemLogService systemLogService;
     
     // 存储验证码和token（用于忘记密码功能）
     private Map<String, String> verificationCodes = new HashMap<>();
@@ -66,9 +71,11 @@ public class LoginController {
                        @RequestParam String role,
                        @RequestParam(required = false) Boolean remember,
                        HttpSession session,
-                       Model model) {
+                       Model model,
+                       HttpServletRequest request) {
         
         // 基本验证
+
         if (!StringUtils.hasText(username) || !StringUtils.hasText(password) || !StringUtils.hasText(role)) {
             model.addAttribute("errorMessage", "用户名、密码和角色不能为空！");
             return "login";
@@ -89,7 +96,17 @@ public class LoginController {
         User user = (User) loginResult.get("user");
         session.setAttribute("currentUser", user);
         session.setAttribute("userRole", role);
-        
+
+
+        // [新增] 记录登录日志 ------------------------------------------
+        systemLogService.recordLog(
+                user.getUsername() + "(" + user.getRealName() + ")", // 操作人
+                "用户登录",                                           // 动作
+                "用户成功登录系统，角色: " + role,                      // 详情
+                request.getRemoteAddr()                              // IP地址
+        );
+        // -----------------------------------------------------------
+
         // 根据角色设置详细信息到session
         if ("student".equals(role)) {
             Student student = (Student) loginResult.get("student");
@@ -112,7 +129,7 @@ public class LoginController {
         } else if ("building_admin".equals(role)) {
             return "redirect:/dorm_admin_index";
         } else if ("system_admin".equals(role)) {
-            return "redirect:/admin/building/list";
+            return "redirect:/sys_admin_index";
         }
         
         return "redirect:/";
