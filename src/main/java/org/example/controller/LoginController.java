@@ -32,7 +32,7 @@ public class LoginController {
     private Map<String, String> resetTokens = new HashMap<>();
     
     // 显示登录页面
-    @GetMapping("/")
+    @GetMapping({"/", "/login"})
     public String showLoginPage(@RequestParam(value = "error", required = false) String error,
                                 @RequestParam(value = "msg", required = false) String msg,
                                 Model model) {
@@ -132,7 +132,7 @@ public class LoginController {
         if(user == null)
             return "redirect:/login";
 
-        return "change_password";
+        return "login/change_password";
     }
     
     // 处理修改密码请求
@@ -152,7 +152,7 @@ public class LoginController {
         String validationError = userService.validatePasswordChange(oldPassword, newPassword, confirmPassword);
         if (validationError != null) {
             model.addAttribute("errorMessage", validationError);
-            return "change_password";
+            return "login/change_password";
         }
         
         // 调用Service修改密码
@@ -163,7 +163,7 @@ public class LoginController {
             return "redirect:/login?msg=passwordChanged";
         } else {
             model.addAttribute("errorMessage", "旧密码错误或修改失败！");
-            return "change_password";
+            return "login/change_password";
         }
     }
     
@@ -171,7 +171,7 @@ public class LoginController {
     @GetMapping("/forgot_password")
     public String showForgotPasswordPage(Model model) {
         model.addAttribute("step", 1);
-        return "forgot_password";
+        return "login/forgot_password";
     }
 
     @PostMapping("/forgot_password/verify")
@@ -189,7 +189,7 @@ public class LoginController {
         if (sessionCaptcha == null || !sessionCaptcha.equalsIgnoreCase(captcha)) {
             model.addAttribute("step", 1);
             model.addAttribute("errorMessage", "验证码错误");
-            return "forgot_password";
+            return "login/forgot_password";
         }
         
         // 验证用户信息（这里简化处理）
@@ -212,7 +212,7 @@ public class LoginController {
         model.addAttribute("token", token);
         model.addAttribute("successMessage", "验证码已发送到您的邮箱，请查收");
         
-        return "forgot_password";
+        return "login/forgot_password";
     }
     
     // 处理第二步：重置密码
@@ -227,7 +227,7 @@ public class LoginController {
         if (!resetTokens.containsKey(token)) {
             model.addAttribute("step", 1);
             model.addAttribute("errorMessage", "链接已过期，请重新申请");
-            return "forgot_password";
+            return "login/forgot_password";
         }
         
         // 验证验证码
@@ -236,7 +236,7 @@ public class LoginController {
             model.addAttribute("step", 2);
             model.addAttribute("token", token);
             model.addAttribute("errorMessage", "验证码错误");
-            return "forgot_password";
+            return "login/forgot_password";
         }
         
         // 验证密码
@@ -244,14 +244,14 @@ public class LoginController {
             model.addAttribute("step", 2);
             model.addAttribute("token", token);
             model.addAttribute("errorMessage", "两次输入的密码不一致");
-            return "forgot_password";
+            return "login/forgot_password";
         }
         
         if (newPassword.length() < 6) {
             model.addAttribute("step", 2);
             model.addAttribute("token", token);
             model.addAttribute("errorMessage", "密码长度不能少于6位");
-            return "forgot_password";
+            return "login/forgot_password";
         }
         
         // 获取用户名并更新密码（这里需要调用Service）
@@ -276,7 +276,7 @@ public class LoginController {
             model.addAttribute("errorMessage", "重置密码失败，请重试");
         }
         
-        return "forgot_password";
+        return "login/forgot_password";
     }
     
     // 生成6位验证码

@@ -68,12 +68,12 @@ public class StudentController {
                 model.addAttribute("warningMessage", "您当前没有宿舍分配，请联系管理员。");
             }
             
-            return "student_index";
+            return "login/student_index";
             
         } catch (Exception e) {
             e.printStackTrace();
             model.addAttribute("errorMessage", "系统错误: " + e.getMessage());
-            return "student_index";
+            return "login/student_index";
         }
     }
     

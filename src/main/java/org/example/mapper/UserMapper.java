@@ -97,7 +97,25 @@ public interface UserMapper {
     Student findStudentByStudentNo(@Param("studentNo") String studentNo);
     
     // 根据用户ID查找学生
-    @Select("SELECT s.* FROM Student s WHERE s.user_id = #{userId}")
+    // 根据用户ID查找学生 (修改后：关联查询User表，防止登录后出现空指针)
+    @Select("SELECT s.*, u.* FROM Student s JOIN User u ON s.user_id = u.user_id WHERE s.user_id = #{userId}")
+    @Results({
+            @Result(property = "studentId", column = "student_id"),
+            @Result(property = "userId", column = "user_id"),
+            @Result(property = "studentNo", column = "student_no"),
+            @Result(property = "major", column = "major"),
+            @Result(property = "className", column = "class_name"),
+            @Result(property = "gender", column = "gender"),
+            // 映射 User 对象的信息
+            @Result(property = "user.userId", column = "user_id"),
+            @Result(property = "user.username", column = "username"),
+            @Result(property = "user.password", column = "password"),
+            @Result(property = "user.role", column = "role"),
+            @Result(property = "user.realName", column = "real_name"),
+            @Result(property = "user.email", column = "email"),
+            @Result(property = "user.phone", column = "phone"),
+            @Result(property = "user.status", column = "status")
+    })
     Student findStudentByUserId(@Param("userId") Integer userId);
     
     // 插入学生信息
