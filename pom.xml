@@ -10,7 +10,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.yx</groupId>
+    <groupId>org.example</groupId>
     <artifactId>dormitory</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>dormitory-system</name>

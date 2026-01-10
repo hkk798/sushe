@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑房间</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="p-4">
+<div class="container" style="max-width: 600px;">
+    <h3 class="mb-4" th:text="${room.roomId == null ? '➕ 新增房间' : '✏️ 编辑房间'}">编辑房间</h3>
+
+    <form action="/admin/room/save" method="post">
+        <input type="hidden" name="roomId" th:value="${room.roomId}">
+
+        <div class="mb-3">
+            <label class="form-label">所属楼栋</label>
+            <select name="buildingId" class="form-select" required>
+                <option value="">-- 请选择楼栋 --</option>
+                <option th:each="b : ${buildings}"
+                        th:value="${b.buildingId}"
+                        th:text="${b.buildingName}"
+                        th:selected="${b.buildingId == room.buildingId}"></option>
+            </select>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">楼层</label>
+                <input type="number" name="floor" class="form-control" th:value="${room.floor}" required placeholder="如: 1">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">房间号</label>
+                <input type="text" name="roomNo" class="form-control" th:value="${room.roomNo}" required placeholder="如: 101">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">床位容量</label>
+                <input type="number" name="capacity" class="form-control" th:value="${room.capacity}" required>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">住宿费 (元/年)</label>
+                <input type="text" name="yearlyFee" class="form-control" th:value="${room.yearlyFee}" required>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">性别限制</label>
+            <select name="genderType" class="form-select">
+                <option value="male" th:selected="${room.genderType == 'male'}">男寝</option>
+                <option value="female" th:selected="${room.genderType == 'female'}">女寝</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">当前状态</label>
+            <select name="status" class="form-select">
+                <option value="available" th:selected="${room.status == 'available'}">空闲</option>
+                <option value="full" th:selected="${room.status == 'full'}">满员</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-success w-100">保存</button>
+        <a href="/admin/room/list" class="btn btn-link w-100 mt-2">返回列表</a>
+    </form>
+</div>
+</body>
+</html>

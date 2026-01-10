@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>房间管理</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="p-4">
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>🛏️ 房间管理</h2>
+        <a th:href="@{/admin/room/form(buildingId=${currentBuildingId})}" class="btn btn-primary">➕ 新增房间</a>
+    </div>
+
+    <table class="table table-striped table-bordered table-hover">
+        <thead class="table-dark">
+        <tr>
+            <th>所属楼栋</th>
+            <th>楼层</th>
+            <th>房间号</th>
+            <th>类型</th>
+            <th>床位(空/总)</th>
+            <th>住宿费</th>
+            <th>状态</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="r : ${rooms}">
+            <td th:text="${r.buildingName}">西9</td>
+            <td th:text="${r.floor}">1</td>
+            <td th:text="${r.roomNo}">101</td>
+            <td>
+                <span th:if="${r.genderType == 'male'}" class="badge bg-primary">男寝</span>
+                <span th:if="${r.genderType == 'female'}" class="badge bg-danger">女寝</span>
+            </td>
+            <td>
+                <span th:text="${r.capacity - r.currentCount}" style="color: green; font-weight: bold;">4</span>
+                / <span th:text="${r.capacity}">4</span>
+            </td>
+            <td th:text="${r.yearlyFee}">1200</td>
+            <td>
+                <span th:if="${r.status == 'available'}" class="badge bg-success">空闲</span>
+                <span th:if="${r.status == 'full'}" class="badge bg-warning text-dark">满员</span>
+            </td>
+            <td>
+                <a th:href="@{/admin/room/form(id=${r.roomId})}" class="btn btn-sm btn-warning">编辑</a>
+                <a th:href="@{/admin/room/delete(id=${r.roomId})}" class="btn btn-sm btn-danger" onclick="return confirm('删除房间将影响已分配的学生，确定吗？')">删除</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <a href="/admin/building/list" class="btn btn-secondary">返回楼栋管理</a>
+</div>
+</body>
+</html>

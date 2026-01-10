@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>编辑楼栋</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="p-4">
+
+<div class="container" style="max-width: 600px;">
+  <h3 class="mb-4" th:text="${building.buildingId == null ? '➕ 新增楼栋' : '✏️ 编辑楼栋'}">编辑楼栋</h3>
+
+  <form action="/admin/building/save" method="post">
+    <input type="hidden" name="buildingId" th:value="${building.buildingId}">
+
+    <div class="mb-3">
+      <label class="form-label">楼栋编号 (如: 西9)</label>
+      <input type="text" name="buildingNo" class="form-control" th:value="${building.buildingNo}" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">楼栋名称</label>
+      <input type="text" name="buildingName" class="form-control" th:value="${building.buildingName}" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">性别限制</label>
+      <select name="genderType" class="form-select">
+        <option value="male" th:selected="${building.genderType == 'male'}">男生楼</option>
+        <option value="female" th:selected="${building.genderType == 'female'}">女生楼</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">建成年份</label>
+      <input type="number" name="builtYear" class="form-control" th:value="${building.builtYear}" value="2020">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">状态</label>
+      <select name="status" class="form-select">
+        <option value="active" th:selected="${building.status == 'active'}">使用中</option>
+        <option value="inactive" th:selected="${building.status == 'inactive'}">停用</option>
+        <option value="repair" th:selected="${building.status == 'repair'}">维修中</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">描述</label>
+      <textarea name="description" class="form-control" rows="3" th:text="${building.description}"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-success w-100">保存</button>
+    <a href="/admin/building/list" class="btn btn-link w-100 mt-2">返回列表</a>
+  </form>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>选择房间</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="p-4">
+<div class="container" style="max-width: 600px;">
+    <h3 class="mb-4">🏠 选择入住房间</h3>
+
+    <form action="/admin/allocation/doAssign" method="post">
+        <input type="hidden" name="studentId" th:value="${studentId}">
+
+        <div class="mb-3">
+            <label class="form-label">可用房间 (系统已自动匹配性别)</label>
+            <select name="roomId" class="form-select" size="10" required>
+                <option th:each="r : ${rooms}"
+                        th:value="${r.roomId}"
+                        th:text="${r.buildingName + ' - ' + r.roomNo + ' (剩余床位: ' + (r.capacity - r.currentCount) + ')'}">
+                </option>
+            </select>
+            <div th:if="${#lists.isEmpty(rooms)}" class="text-danger mt-2">
+                无可用房间，请先在“房间管理”中添加对应性别的房间。
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100" th:disabled="${#lists.isEmpty(rooms)}">确认分配</button>
+        <a href="/admin/allocation/list" class="btn btn-link w-100 mt-2">返回</a>
+    </form>
+</div>
+</body>
+</html>
