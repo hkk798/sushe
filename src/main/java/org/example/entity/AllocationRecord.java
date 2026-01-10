@@ -18,6 +18,7 @@ public class AllocationRecord {
     private String bedNo;           // 对应 bed_no
     private String contractNo;      // 对应 contract_no
     private String remarks;         // 对应 remarks
+    private Room room;
 
     // 扩展字段 (用于前端显示，数据库里没有)
     private String studentName;
@@ -154,6 +155,19 @@ public class AllocationRecord {
 
     public void setBuildingName(String buildingName) {
         this.buildingName = buildingName;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
+
+    public boolean isActive() {
+
+        return "active".equals(status);
     }
 
 }

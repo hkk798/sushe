@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宿舍管理系统 - 登录</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5ad;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            border-radius: 15px;
+            padding: 40px 35px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .main-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        
+        .sub-title {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: normal;
+        }
+        
+        .form-control-custom {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            height: 50px;
+        }
+        
+        .role-options {
+            display: flex;
+            gap: 15px;
+            margin: 10px 0 20px;
+        }
+        
+        .role-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+            cursor: pointer;
+            color: #666;
+            text-align: center;
+        }
+        
+        .role-btn.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        
+        .login-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0 25px;
+        }
+        
+        .forgot-password {
+            color: #20c997;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .btn-login {
+            background: linear-gradient(135deg,rgb(0, 119, 255) 0%);
+            border: none;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            height: 50px;
+            border-radius: 8px;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .register-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .register-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .role-select {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            height: 50px;
+            width: 100%;
+            font-size: 14px;
+            color: #333;
+            background: #f9f9f9;
+            cursor: pointer;
+        }
+
+        .role-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <!-- 标题 -->
+        <h1 class="main-title">🏠 宿舍管理系统</h1>
+        <div class="sub-title">统一身份认证</div>
+        
+        <!-- 消息提示 -->
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <strong>登录失败！</strong> <span th:text="${errorMessage}"></span>
+        </div>
+        
+        <div th:if="${successMessage}" class="alert alert-success">
+            <span th:text="${successMessage}"></span>
+        </div>
+        
+        <!-- 登录表单 -->
+        <form th:action="@{/login}" method="post">
+            <!-- 用户名 -->
+            <div class="mb-3">
+                <label class="form-label">用户名</label>
+                <input type="text" 
+                       class="form-control form-control-custom" 
+                       id="username" 
+                       name="username"
+                       th:value="${rememberedUsername}"
+                       placeholder="请输入学号/工号"
+                       required>
+            </div>
+            
+            <!-- 密码 -->
+            <div class="mb-3">
+                <label class="form-label">密码</label>
+                <input type="password" 
+                       class="form-control form-control-custom" 
+                       id="password" 
+                       name="password" 
+                       placeholder="请输入密码"
+                       required>
+            </div>
+            
+            <!-- 角色选择 -->
+            <div class="mb-3">
+                <label class="form-label">角色</label>
+                <select class="role-select" id="role" name="role" required>
+                    <option value="student" 
+                            th:selected="${inputRole == 'student' or inputRole == null}">学生</option>
+                    <option value="building_admin" 
+                            th:selected="${inputRole == 'building_admin'}">宿舍管理员</option>
+                    <option value="system_admin" 
+                            th:selected="${inputRole == 'system_admin'}">系统管理员</option>
+                </select>
+            </div>
+            
+            <!-- 记住我和忘记密码 -->
+            <div class="login-options">
+                <div class="form-check">
+                    <input type="checkbox" 
+                           class="form-check-input" 
+                           id="remember" 
+                           name="remember">
+                    <label class="form-check-label" for="remember">记住我</label>
+                </div>
+                <a href="/forgot_password" class="forgot-password">忘记密码？</a>
+            </div>
+            
+            <!-- 登录按钮 -->
+            <button type="submit" class="btn btn-login">立即登录</button>
+        </form>
+    </div>
+
+    <script>
+        // 记住我功能
+        const usernameInput = document.getElementById('username');
+        const rememberCheckbox = document.getElementById('remember');
+        
+        // 加载保存的用户名
+        const savedUsername = localStorage.getItem('rememberedUsername');
+        if (savedUsername) {
+            usernameInput.value = savedUsername;
+            rememberCheckbox.checked = true;
+        }
+        
+        // 保存用户名
+        rememberCheckbox.addEventListener('change', function() {
+            const username = usernameInput.value.trim();
+            if (this.checked && username) {
+                localStorage.setItem('rememberedUsername', username);
+            } else {
+                localStorage.removeItem('rememberedUsername');
+            }
+        });
+        
+        // 输入时更新保存的用户名
+        usernameInput.addEventListener('input', function() {
+            if (rememberCheckbox.checked) {
+                localStorage.setItem('rememberedUsername', this.value);
+            }
+        });
+        
+        // 表单验证
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const username = usernameInput.value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!username || !password) {
+                e.preventDefault();
+                alert('请输入用户名和密码');
+                return false;
+            }
+            
+            if (role === 'student') {
+                // 学生：8位数字
+                if (!/^\d{8}$/.test(username)) {
+                    showError('username', '学生学号应为8位数字');
+                }
+            } else {
+                // 管理员：字母+数字组合
+                if (username.length < 2) {
+                    showError('username', '工号格式不正确');
+                }
+            }
+            
+            return true;
+        });
+    </script>
+</body>
+</html>

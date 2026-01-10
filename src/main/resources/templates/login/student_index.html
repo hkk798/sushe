@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生主页 - 宿舍管理系统</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
+            background-color: #f5f7fb;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* 顶部导航栏 */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 15px 30px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .user-details {
+            text-align: right;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .user-role {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        /* 主要内容区域 */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        /* 欢迎标语和待办提醒 */
+        .welcome-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 8px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary-color), var(--success-color));
+        }
+        
+        .welcome-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 10px;
+        }
+        
+        .welcome-subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .badge-notification {
+            background: var(--warning-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* 宿舍信息卡 */
+        .dashboard-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-icon {
+            color: var(--primary-color);
+            font-size: 24px;
+        }
+        
+        .dorm-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .info-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .info-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .info-value.highlight {
+            color: var(--warning-color);
+        }
+        
+        /* 快捷操作 */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .action-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px 20px;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .action-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(67, 97, 238, 0.15);
+        }
+        
+        .action-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .action-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark-color);
+        }
+        
+        .action-desc {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* 警告消息 */
+        .alert-warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .alert-icon {
+            color: #ffc107;
+            font-size: 24px;
+        }
+        
+        /* 消息提示 */
+        .message-container {
+            margin-bottom: 25px;
+        }
+        
+        .alert-custom {
+            border-radius: 10px;
+            padding: 15px 20px;
+            border: none;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .user-info {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .dashboard-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .dorm-info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .welcome-title {
+                font-size: 24px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 0 15px;
+            }
+            
+            .welcome-section,
+            .dashboard-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <i class="fas fa-home"></i>
+            宿舍管理系统 - 学生平台
+        </div>
+        <div class="user-info">
+            <div class="user-avatar">
+                <span th:text="${student.user.realName != null ? student.user.realName.substring(0,1) : 'S'}"></span>
+            </div>
+            <div class="user-details">
+                <div class="user-name" th:text="${student.user.realName}">学生姓名</div>
+                <div class="user-role">
+                    学号: <span th:text="${student.studentNo}">20230001</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 主要内容区域 -->
+    <div class="container">
+        <!-- 消息提示 -->
+        <div class="message-container">
+            <div th:if="${errorMessage}" class="alert alert-danger alert-custom">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${errorMessage}"></span>
+            </div>
+            
+            <div th:if="${warningMessage}" class="alert alert-warning alert-custom">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span th:text="${warningMessage}"></span>
+            </div>
+            
+            <div th:if="${successMessage}" class="alert alert-success alert-custom">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${successMessage}"></span>
+            </div>
+        </div>
+        
+        <!-- 欢迎标语和待办提醒 -->
+        <div class="welcome-section">
+            <h1 class="welcome-title">
+                欢迎回来，<span th:text="${student.user.realName}">同学</span>！
+            </h1>
+            <p class="welcome-subtitle">
+                今天是 <span id="current-date"></span>，祝您学习生活愉快！
+            </p>
+            
+            <div class="badge-notification" th:if="${processingRepairsCount > 0}">
+                <i class="fas fa-tools"></i>
+                您有 <span th:text="${processingRepairsCount}">0</span> 个待处理的报修单
+            </div>
+            <div class="badge-notification" style="background: var(--success-color);" th:unless="${processingRepairsCount > 0}">
+                <i class="fas fa-check-circle"></i>
+                暂无待处理事项
+            </div>
+        </div>
+        
+        <!-- 宿舍信息卡（如果有宿舍分配） -->
+        <div th:if="${hasDorm}">
+            <div class="dashboard-section">
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-bed card-icon"></i>
+                            宿舍信息
+                        </h2>
+                        <span class="badge bg-primary" th:if="${dormInfo != null}">
+                            <i class="fas fa-user-friends"></i>
+                            舍友: <span th:text="${stats.totalRoommates}">0</span>人
+                        </span>
+                    </div>
+                    
+                    <div class="dorm-info-grid" th:if="${dormInfo != null}">
+                        <div class="info-item">
+                            <div class="info-label">楼栋</div>
+                            <div class="info-value" th:text="${dormInfo.buildingName} ?: dormInfo.buildingId">1号楼</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">房间号</div>
+                            <div class="info-value" th:text="${dormInfo.roomNumber}">101</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">床位号</div>
+                            <div class="info-value" th:text="${dormInfo.bedNumber}">A01</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">楼层</div>
+                            <div class="info-value" th:text="${dormInfo.floor}">1楼</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">房间类型</div>
+                            <div class="info-value" 
+                                th:if="${dormInfo.roomType == 'M' or dormInfo.roomType == '男'}"
+                                th:text="'男生宿舍'">
+                                男生宿舍
+                            </div>
+                            <div class="info-value" 
+                                th:unless="${dormInfo.roomType == 'M' or dormInfo.roomType == '男'}"
+                                th:text="'女生宿舍'">
+                                女生宿舍
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">月度费用</div>
+                            <div class="info-value highlight" 
+                                th:text="${dormInfo.monthlyFee != null} ? '¥' + ${dormInfo.monthlyFee} : '待定'">
+                                ¥800
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div th:if="${dormInfo == null}" class="alert alert-warning">
+                        <i class="fas fa-info-circle"></i>
+                        暂无宿舍分配信息
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 无宿舍分配提示 -->
+        <div th:unless="${hasDorm}" class="alert-warning">
+            <i class="fas fa-exclamation-triangle alert-icon"></i>
+            <div>
+                <strong>温馨提示：</strong>您当前没有宿舍分配信息。如需入住宿舍，请联系楼宇管理员或前往宿管中心办理。
+            </div>
+        </div>
+        
+        <!-- 快捷操作入口 -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-bolt card-icon"></i>
+                    快捷操作
+                </h2>
+            </div>
+            
+            <div class="quick-actions">
+                <a href="/repair_submit" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="action-title">我要报修</div>
+                    <div class="action-desc">提交新的报修申请</div>
+                </a>
+                
+                <a href="/my_repairs" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="action-title">我的报修</div>
+                    <div class="action-desc">查看报修进度</div>
+                </a>
+                
+                <a href="/my_dorm" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="action-title">我的宿舍</div>
+                    <div class="action-desc">查看宿舍详情</div>
+                </a>
+                
+                <a href="/student_info" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="action-title">个人信息</div>
+                    <div class="action-desc">查看和修改信息</div>
+                </a>
+                
+                <a href="/change_password" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <div class="action-title">修改密码</div>
+                    <div class="action-desc">更新登录密码</div>
+                </a>
+                
+                <a href="/logout" class="action-card" onclick="return confirm('确定要退出登录吗？');">
+                    <div class="action-icon" style="background: linear-gradient(135deg, #ff6b6b, #ee5a52);">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </div>
+                    <div class="action-title">退出登录</div>
+                    <div class="action-desc">安全退出系统</div>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 显示当前日期
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+            };
+            document.getElementById('current-date').textContent = 
+                now.toLocaleDateString('zh-CN', options);
+        }
+        
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCurrentDate();
+            
+            // 添加卡片悬停效果
+            const actionCards = document.querySelectorAll('.action-card');
+            actionCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+            
+            // 如果有待办事项，添加闪烁提醒
+            const processingCount = parseInt(document.querySelector('.badge-notification span')?.textContent || '0');
+            if (processingCount > 0) {
+                const badge = document.querySelector('.badge-notification');
+                setInterval(() => {
+                    badge.style.opacity = badge.style.opacity === '0.7' ? '1' : '0.7';
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>

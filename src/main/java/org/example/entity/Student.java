@@ -11,6 +11,7 @@ public class Student {
     private String major;           // 专业
     private String className;       // 班级
     private String gender;          // 性别 (M/F)
+    private User user;
 
     // 扩展字段 (用于显示姓名，数据来自 User 表)
     private String realName;
@@ -71,4 +72,13 @@ public class Student {
     public void setRealName(String realName) {
         this.realName = realName;
     }
+
+    public User getUser( ) {
+        return user;
+   }
+
+    public void setUser(User user) {
+        this.user  = user;
+    }
+
 }

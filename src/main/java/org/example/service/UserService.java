@@ -1,0 +1,313 @@
+package org.example.service;
+
+import org.example.entity.User;
+import org.example.entity.Student;
+import org.example.entity.Admin;
+import org.example.mapper.UserMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class UserService {
+    
+    @Autowired
+    private UserMapper userMapper;
+    
+    /**
+     * 用户登录验证
+     */
+    public Map<String, Object> login(String username, String password, String role) {
+        Map<String, Object> result = new HashMap<>();
+        
+        if (!StringUtils.hasText(username) || !StringUtils.hasText(password) || !StringUtils.hasText(role)) {
+            return null;
+        }
+        
+        User user = null;
+
+        // 根据角色采用不同的查找策略
+        if ("student".equals(role)) {
+            // 对于学生：使用学号查找对应的学生，再获取其用户信息
+            Student student = userMapper.findStudentByStudentNo(username); // username实际上是学号
+            if (student != null && student.getUser() != null) {
+                user = student.getUser();
+                // 验证密码
+                if (!password.equals(user.getPassword())) {
+                    return null;
+                }
+            }
+        } else {
+            // 对于管理员：直接使用用户名+密码查找
+            Admin admin = userMapper.findAdminByAdminNo(username);
+            if (admin != null && admin.getUser() != null) {
+                user = admin.getUser();
+                if (!password.equals(user.getPassword())) {
+                    return null;
+                }
+            }
+        }
+        
+        if (user == null) {
+            return null;
+        }
+        
+        // 验证角色匹配
+        if (!role.equals(user.getRole())) {
+            return null;
+        }
+        
+        // 验证用户状态
+        if (!"active".equals(user.getStatus())) {
+            return null;
+        }
+        
+        result.put("user", user);
+        
+        // 根据角色获取详细信息
+        if ("student".equals(role)) {
+            Student student = userMapper.findStudentByUserId(user.getUserId());
+            result.put("student", student);
+        } else if ("building_admin".equals(role) || "system_admin".equals(role)) {
+            Admin admin = userMapper.findAdminByUserId(user.getUserId());
+            result.put("admin", admin);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * 根据用户ID和角色获取完整信息
+     */
+    public Map<String, Object> getUserWithDetails(Integer userId, String role) {
+        Map<String, Object> result = new HashMap<>();
+        
+        User user = userMapper.findById(userId);
+        if (user == null) {
+            return null;
+        }
+        
+        result.put("user", user);
+        
+        // 根据角色获取详细信息
+        if ("student".equals(role)) {
+            Student student = userMapper.findStudentByUserId(userId);
+            result.put("student", student);
+        } else if ("building_admin".equals(role) || "system_admin".equals(role)) {
+            Admin admin = userMapper.findAdminByUserId(userId);
+            result.put("admin", admin);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * 注册用户
+     */
+    public boolean register(User user, Student student, Admin admin) {
+        if (user == null || !StringUtils.hasText(user.getUsername()) || 
+            !StringUtils.hasText(user.getPassword()) || !StringUtils.hasText(user.getRole())) {
+            return false;
+        }
+        
+        // 检查用户名是否已存在
+        if (userMapper.countByUsername(user.getUsername()) > 0) {
+            return false;
+        }
+        
+        try {
+            // 保存用户基本信息
+            int result = userMapper.save(user);
+            if (result <= 0) {
+                return false;
+            }
+            
+            // 根据角色保存详细信息
+            if ("student".equals(user.getRole()) && student != null) {
+                student.setUserId(user.getUserId());
+                userMapper.saveStudent(student);
+            } else if (("building_admin".equals(user.getRole()) || "system_admin".equals(user.getRole())) && admin != null) {
+                admin.setUserId(user.getUserId());
+                userMapper.saveAdmin(admin);
+            }
+            
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * 修改密码
+     */
+    public boolean changePassword(Integer userId, String oldPassword, String newPassword) {
+        if (userId == null || !StringUtils.hasText(oldPassword) || !StringUtils.hasText(newPassword)) {
+            return false;
+        }
+        
+        // 获取用户信息
+        User user = userMapper.findById(userId);
+        if (user == null) {
+            return false;
+        }
+        
+        // 验证旧密码
+        if (!oldPassword.equals(user.getPassword())) {
+            return false;
+        }
+        
+        // 验证新旧密码不能相同
+        if (oldPassword.equals(newPassword)) {
+            return false;
+        }
+        
+        // 更新密码
+        try {
+            int result = userMapper.updatePassword(userId, newPassword);
+            return result > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * 获取所有用户
+     */
+    public List<User> getAllUsers() {
+        return userMapper.findAll();
+    }
+    
+    /**
+     * 获取所有学生
+     */
+    public List<Student> getAllStudents() {
+        return userMapper.findAllStudents();
+    }
+    
+    /**
+     * 获取所有管理员
+     */
+    public List<Admin> getAllAdmins() {
+        return userMapper.findAllAdmins();
+    }
+    
+    /**
+     * 根据类型获取管理员
+     */
+    public List<Admin> getAdminsByType(String adminType) {
+        return userMapper.findAdminsByType(adminType);
+    }
+    
+    /**
+     * 更新用户状态
+     */
+    public boolean updateUserStatus(Integer userId, String status) {
+        if (userId == null || !StringUtils.hasText(status)) {
+            return false;
+        }
+        
+        try {
+            int result = userMapper.updateStatus(userId, status);
+            return result > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean verifyUserIdentity(String username, String email, String role) {
+        if (!StringUtils.hasText(username) || !StringUtils.hasText(email) || !StringUtils.hasText(role)) {
+            return false;
+        }
+        
+        try {
+            // 根据角色查询用户
+            if ("student".equals(role)) {
+                // 如果是学生，通过学号查找
+                var student = userMapper.findStudentByStudentNo(username);
+                if (student != null && student.getUser() != null) {
+                    return email.equals(student.getUser().getEmail());
+                }
+            } else if ("building_admin".equals(role) || "system_admin".equals(role)) {
+                // 如果是管理员，通过工号查找
+                var admin = userMapper.findAdminByAdminNo(username);
+                if (admin != null && admin.getUser() != null) {
+                    return email.equals(admin.getUser().getEmail());
+                }
+            }
+            
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * 重置密码
+     */
+    public boolean resetPassword(String username, String newPassword) {
+        if (!StringUtils.hasText(username) || !StringUtils.hasText(newPassword)) {
+            return false;
+        }
+        
+        try {
+            // 查找用户
+            var user = userMapper.findByUsername(username);
+            if (user == null) {
+                return false;
+            }
+            
+            // 更新密码
+            int result = userMapper.updatePassword(user.getUserId(), newPassword);
+            return result > 0;
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public String validatePasswordChange(String oldPassword, String newPassword, String confirmPassword) {
+        // 检查是否填写完整
+        if (!StringUtils.hasText(oldPassword) || !StringUtils.hasText(newPassword) || 
+            !StringUtils.hasText(confirmPassword)) {
+            return "请填写所有必填字段";
+        }
+        
+        // 检查新密码长度
+        if (newPassword.length() < 6) {
+            return "新密码长度不能少于6位";
+        }
+        
+        // 检查两次输入的新密码是否一致
+        if (!newPassword.equals(confirmPassword)) {
+            return "两次输入的新密码不一致";
+        }
+        
+        // 检查新旧密码是否相同
+        if (oldPassword.equals(newPassword)) {
+            return "新密码不能与旧密码相同";
+        }
+        
+        return null; // 验证通过
+    }
+
+    /**
+     * 检查用户名是否存在
+     */
+    public boolean checkUsernameExists(String username) {
+        if (!StringUtils.hasText(username)) {
+            return false;
+        }
+        
+        int count = userMapper.countByUsername(username);
+        return count > 0;
+    }
+}
