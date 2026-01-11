@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报修单详情 - 宿舍管理系统</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .detail-card {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 15px;
+            padding: 40px 35px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+        }
+        
+        .main-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            text-align: left;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        /* 表单行样式 */
+        .form-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .form-label {
+            min-width: 120px;
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+            text-align: left;
+        }
+        
+        /* 只读信息框 */
+        .readonly-info {
+            flex: 1;
+            padding: 12px 15px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            min-height: 46px;
+            display: flex;
+            align-items: center;
+            color: #666;
+        }
+        
+        /* 问题描述样式 */
+        .form-textarea-readonly {
+            flex: 1;
+            padding: 15px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            background-color: #f8f9fa;
+            min-height: 120px;
+            resize: none;
+            font-family: inherit;
+            line-height: 1.5;
+            color: #666;
+            white-space: pre-wrap;
+            word-break: break-word;
+            text-align: left;
+        }
+        
+        /* 图片展示区域 */
+        .file-display-box-detail {
+            flex: 1;
+            min-height: 50px;
+            padding: 12px 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            min-height: 150px;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+        }
+        
+        .image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+            width: 100%;
+        }
+        
+        .image-item {
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .image-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+        
+        .image-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .no-images {
+            color: #999;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+            font-size: 16px;
+        }
+        
+        /* 模态框样式 */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+        }
+        
+        .modal-image {
+            max-width: 100%;
+            max-height: 90vh;
+            display: block;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: -40px;
+            right: -10px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+        }
+        
+        .close-modal:hover {
+            color: #ccc;
+        }
+        
+        /* 按钮组 */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 40px;
+            width: 100%;
+            clear: both;
+        }
+
+        .btn-back {
+            background: white;
+            border: 2px solid #333;
+            color: #333;
+            font-size: 16px;
+            font-weight: bold;
+            height: 50px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 0 40px;
+            display: inline-block;
+            min-width: 200px;
+            text-align: center;
+            line-height: 46px;
+        }
+        
+        .btn-back:hover {
+            background: #f5f5f5;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 消息提示 */
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border: 1px solid transparent;
+        }
+        
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        
+        @media (max-width: 576px) {
+            .detail-card {
+                padding: 30px 25px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .form-label {
+                margin-bottom: 8px;
+                min-width: 100px;
+            }
+            
+            .image-item {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn-back {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="detail-card">
+        <!-- 第一部分：标题 -->
+        <h1 class="main-title">报修单详情</h1>
+        
+        <!-- 消息提示 -->
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <span th:text="${errorMessage}"></span>
+        </div>
+        
+        <!-- 第二部分：报修单详情 -->
+        <div class="info-section">
+            <div class="info-section-title">基本信息</div>
+            
+            <!-- 报修位置 -->
+            <div class="form-row">
+                <label class="form-label">报修位置：</label>
+                <div class="readonly-info">
+                    <span th:text="${repairLocation != null ? repairLocation : '未知位置'}"></span>
+                </div>
+            </div>
+            
+            <!-- 报修类别 -->
+            <div class="form-row">
+                <label class="form-label">报修类别：</label>
+                <div class="readonly-info">
+                    <span th:text="${repairOrder != null ? repairOrder.category : '未知类别'}"></span>
+                </div>
+            </div>
+            
+            <!-- 问题描述 -->
+            <div class="form-row" style="align-items: flex-start;">
+                <label class="form-label">问题描述：</label>
+                <div class="form-textarea-readonly">
+                    <span th:if="${repairOrder != null and repairOrder.description != null and repairOrder.description != ''}" 
+                        th:utext="${'&nbsp;&nbsp;' + repairOrder.description}"></span>
+                    <span th:if="${repairOrder == null or repairOrder.description == null or repairOrder.description == ''}" 
+                        style="color: #999; font-style: italic;">无详细描述</span>
+                </div>
+            </div>
+            
+            <!-- 上传图片 -->
+            <div class="form-row" style="align-items: flex-start;">
+                <label class="form-label">上传图片：</label>
+                <div class="file-display-box-detail">
+                    <div class="image-gallery" id="imageGallery">
+                        <span class="no-images" 
+                              th:if="${imagePaths == null or imagePaths.isEmpty()}">无上传图片</span>
+                        
+                        <!-- 图片预览区域 -->
+                        <div th:each="imagePath : ${imagePaths}" 
+                             class="image-item" 
+                             th:onclick="'openImageModal(this)'" 
+                             th:data-image="|/uploads/${imagePath}|">
+                            <img th:src="|/uploads/${imagePath}|" 
+                                 alt="报修图片" 
+                                 class="image-preview">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 按钮组 -->
+        <div class="button-container">
+            <button type="button" class="btn-back" onclick="window.history.back()">返回</button>
+        </div>
+    </div>
+    
+    <!-- 图片放大模态框 -->
+    <div id="imageModal" class="image-modal" onclick="closeImageModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="close-modal" onclick="closeImageModal()">&times;</button>
+            <img id="modalImage" class="modal-image" src="" alt="放大图片">
+        </div>
+    </div>
+
+    <script>
+        // 打开图片模态框
+        function openImageModal(element) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            const imageSrc = element.getAttribute('data-image');
+            
+            modalImage.src = imageSrc;
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // 关闭图片模态框
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            
+            modal.style.display = 'none';
+            modalImage.src = '';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // 按ESC键关闭模态框
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeImageModal();
+            }
+        });
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 自动隐藏消息提示
+            const alerts = document.querySelectorAll('.alert');
+            if (alerts.length > 0) {
+                setTimeout(() => {
+                    alerts.forEach(alert => {
+                        alert.style.opacity = '0';
+                        alert.style.transition = 'opacity 0.5s ease';
+                        setTimeout(() => alert.style.display = 'none', 500);
+                    });
+                }, 5000);
+            }
+            
+            // 图片加载失败处理
+            document.querySelectorAll('.image-preview').forEach(img => {
+                img.onerror = function() {
+                    this.onerror = null;
+                    this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICA8cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjgiIGZpbGw9IiNFRUVFRUUiLz4KICAgIDxwYXRoIGQ9Ik00NSA0MEg3NVY3MEg0NVY0MFpNNDUgNDBMNDAgNTVMNTUgNzVMNzAgNTBMNzUgNjVMNjUgODBMNDAgNjVWNTBaIiBmaWxsPSIjQ0NDQ0NDIi8+CiAgICA8cGF0aCBkPSJNODAgMzVDODAgMzQuNDQ3NyA3OS41NTIzIDM0IDc5IDM0SDQxQzQwLjQ0NzcgMzQgNDAgMzQuNDQ3NyA0MCAzNVY4NUM0MCA4NS41NTIzIDQwLjQ3NyA4NiA0MSA4Nkg3OUM3OS41NTIzIDg2IDgwIDg1LjU1MjMgODAgODVWMzVaIiBmaWxsPSIjQ0NDQ0NDIi8+CiAgICA8cGF0aCBkPSJNNTAgNTBDNTQuOTYyNSA1MCA1OSA0NS45NjI1IDU5IDQxQzU5IDM2LjAzNzUgNTQuOTYyNSAzMiA1MCAzMkM0NS4wMzc1IDMyIDQxIDM2LjAzNzUgNDEgNDFDNDEgNDUuOTYyNSA0NS4wMzc1IDUwIDUwIDUwWiIgZmlsbD0iI0NDQ0NDQyIvPgo8L3N2Zz4=';
+                };
+            });
+        });
+    </script>
+</body>
+</html>

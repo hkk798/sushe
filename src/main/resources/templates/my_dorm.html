@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的宿舍 - 宿舍管理系统</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .dorm-card {
+            width: 100%;
+            max-width: 700px;
+            background: white;
+            border-radius: 15px;
+            padding: 40px 35px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+        }
+        
+        .main-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            text-align: left;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin: 25px 0 15px 0;
+        }
+        
+        /* 基本信息区域 */
+        .info-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .info-label {
+            min-width: 120px;
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+            text-align: left;
+        }
+        
+        .info-content {
+            flex: 1;
+            padding: 12px 15px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            min-height: 46px;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* 舍友表格区域 */
+        .roommates-section {
+            margin-top: 10px;
+        }
+        
+        .roommates-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-top: 10px;
+        }
+        
+        .roommates-table th {
+            background-color: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .roommates-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            color: #555;
+        }
+        
+        .roommates-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        /* 高亮当前用户行 */
+        .current-user {
+            background-color: #e3f2fd !important;
+            font-weight: bold;
+        }
+        
+        /* 按钮组 */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+        }
+        
+        .btn-repair {
+            flex: 1;
+            background: white;
+            border: 2px solid #333;
+            color: #333;
+            font-size: 16px;
+            font-weight: bold;
+            height: 50px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-repair:hover {
+            background: #f5f5f5;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-repair:disabled {
+            background: #f8f9fa;
+            border-color: #dee2e6;
+            color: #adb5bd;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-back {
+            flex: 1;
+            background: #333;
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            height: 50px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-back:hover {
+            background: #555;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* 消息提示 */
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border: 1px solid transparent;
+        }
+        
+        .alert-warning {
+            color: #856404;
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+        }
+        
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        
+        .empty-message {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-size: 16px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        @media (max-width: 576px) {
+            .dorm-card {
+                padding: 30px 25px;
+            }
+            
+            .info-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .info-label {
+                margin-bottom: 8px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn-repair, .btn-back {
+                width: 100%;
+            }
+            
+            .roommates-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dorm-card">
+        <!-- 第一部分：标题 -->
+        <h1 class="main-title">我的宿舍信息</h1>
+        
+        <!-- 消息提示 -->
+        <div th:if="${warningMessage}" class="alert alert-warning">
+            <span th:text="${warningMessage}"></span>
+        </div>
+        
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <span th:text="${errorMessage}"></span>
+        </div>
+        
+        <!-- 第二部分：基本信息 -->
+        <h3 class="section-title">基本信息</h3>
+        
+        <div th:if="${dormInfo != null}">
+            <!-- 楼栋信息 -->
+            <div class="info-row">
+                <div class="info-label">楼栋：</div>
+                <div class="info-content">
+                    <span th:if="${dormInfo.building != null}">
+                        <span th:text="${dormInfo.building.buildingName != null} ? 
+                                 ${dormInfo.building.buildingName} : 
+                                 (${dormInfo.building.buildingNo != null} ? 
+                                 ${dormInfo.building.buildingNo} + '楼' : '未知楼栋')">
+                        </span>
+                    </span>
+                    <span th:unless="${dormInfo.building != null}">
+                        暂无楼栋信息
+                    </span>
+                </div>
+            </div>
+            
+            <!-- 房间信息 -->
+            <div class="info-row">
+                <div class="info-label">房间：</div>
+                <div class="info-content">
+                    <span th:if="${dormInfo.room != null}">
+                        <span th:text="${dormInfo.room.roomNo}"></span>
+                    </span>
+                    <span th:unless="${dormInfo.room != null}">
+                        暂无房间信息
+                    </span>
+                </div>
+            </div>
+            
+            <!-- 类型信息 -->
+            <div class="info-row">
+                <div class="info-label">类型：</div>
+                <div class="info-content">
+                    <span th:if="${dormInfo.room != null}">
+                        <span th:text="${dormInfo.room.capacity}"></span>人间
+                        <span th:if="${dormInfo.room.genderType != null}">
+                            (<span th:text="${dormInfo.room.genderType == 'male' ? '男' : '女'}"></span>)
+                        </span>
+                    </span>
+                    <span th:unless="${dormInfo.room != null}">
+                        暂无类型信息
+                    </span>
+                </div>
+            </div>
+            
+            <!-- 住宿费信息 -->
+            <div class="info-row">
+                <div class="info-label">住宿费：</div>
+                <div class="info-content">
+                    <span th:if="${dormInfo.room != null and dormInfo.room.yearlyFee != null}">
+                        <span th:text="${#numbers.formatDecimal(dormInfo.room.yearlyFee, 1, 0)}"></span>元
+                    </span>
+                    <span th:unless="${dormInfo.room != null and dormInfo.room.yearlyFee != null}">
+                        待定
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 无宿舍信息提示 -->
+        <div th:if="${dormInfo == null}" class="empty-message">
+            暂无宿舍分配信息
+        </div>
+        
+        <!-- 第三部分：我的舍友 -->
+        <h3 class="section-title">我的舍友</h3>
+        
+        <div class="roommates-section" th:if="${dormInfo != null}">
+            <table class="roommates-table">
+                <thead>
+                    <tr>
+                        <th>床位</th>
+                        <th>姓名</th>
+                        <th>学号</th>
+                        <th>班级</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 第一行：当前用户 -->
+                    <tr class="current-user">
+                        <td th:text="${dormInfo.bedNo != null} ? ${dormInfo.bedNo} : '未分配'"></td>
+                        <td>
+                            <span th:text="${student != null and student.user != null ? student.user.realName : '未知姓名'}"></span>
+                            <span style="color: #007bff; font-size: 12px; margin-left: 5px;">(我)</span>
+                        </td>
+                        <td th:text="${student != null ? student.studentNo : '未知学号'}"></td>
+                        <td th:text="${student != null ? student.className : '未设置班级'}"></td>
+                    </tr>
+                    
+                    <!-- 显示其他舍友 -->
+                    <tr th:each="roommate : ${otherRoommates}" 
+                        th:if="${otherRoommates != null and !otherRoommates.isEmpty()}">
+                        <td th:text="${roommate['bedNo'] != null} ? ${roommate['bedNo']} : '未分配'"></td>
+                        <td th:text="${roommate['realName'] != null} ? ${roommate['realName']} : '未知姓名'"></td>
+                        <td th:text="${roommate['studentNo'] != null} ? ${roommate['studentNo']} : '未知学号'}"></td>
+                        <td th:text="${roommate['className'] != null} ? ${roommate['className']} : '未设置班级'}"></td>
+                    </tr>
+                    
+                    <!-- 如果没有其他舍友，显示空行提示 -->
+                    <tr th:if="${otherRoommates == null or otherRoommates.isEmpty()}">
+                        <td colspan="4" class="empty-message" style="margin: 0; padding: 20px;">
+                            暂无其他舍友
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- 入住情况统计 -->
+            <div class="info-row" style="margin-top: 20px; margin-bottom: 0;">
+                <div class="info-label">入住情况：</div>
+                <div class="info-content">
+                    <span th:text="${1 + (otherRoommates != null ? otherRoommates.size() : 0)}">1</span>/
+                    <span th:text="${dormInfo.room != null ? dormInfo.room.capacity : 0}">0</span>人
+                    <span th:if="${dormInfo.room != null and (1 + (otherRoommates != null ? otherRoommates.size() : 0)) < dormInfo.room.capacity}" 
+                          style="color: green; margin-left: 10px;">
+                        (尚有<span th:text="${dormInfo.room.capacity - (1 + (otherRoommates != null ? otherRoommates.size() : 0))}"></span>空位)
+                    </span>
+                    <span th:if="${dormInfo.room != null and (1 + (otherRoommates != null ? otherRoommates.size() : 0)) >= dormInfo.room.capacity}" 
+                          style="color: red; margin-left: 10px;">
+                        (已住满)
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <div th:if="${dormInfo == null}" class="empty-message">
+            无宿舍分配信息
+        </div>
+        
+        <!-- 按钮组 -->
+        <div class="button-group">
+            <button type="button" class="btn-repair" 
+                    th:onclick="${dormInfo != null} ? 'window.location.href=\'/room_repair_history\'': ''"
+                    th:disabled="${dormInfo == null}">
+                查看本房间报修历史
+            </button>
+            <button type="button" class="btn-back" onclick="window.location.href='/student_index'">
+                返回
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载时检查是否有消息提示
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            if (alerts.length > 0) {
+                // 5秒后自动隐藏消息提示
+                setTimeout(() => {
+                    alerts.forEach(alert => {
+                        alert.style.opacity = '0';
+                        alert.style.transition = 'opacity 0.5s ease';
+                        setTimeout(() => alert.style.display = 'none', 500);
+                    });
+                }, 5000);
+            }
+            
+            // 表格行悬停效果（除了当前用户行）
+            const tableRows = document.querySelectorAll('.roommates-table tbody tr:not(.current-user)');
+            tableRows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = '#f0f7ff';
+                });
+                
+                row.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = '';
+                });
+                
+                // 点击显示详细信息
+                row.addEventListener('click', function() {
+                    const cells = this.querySelectorAll('td');
+                    if (cells.length >= 4) {
+                        const bed = cells[0].textContent;
+                        const name = cells[1].textContent;
+                        const studentNo = cells[2].textContent;
+                        const className = cells[3].textContent;
+                        
+                        if (name && !name.includes('暂无其他舍友')) {
+                            alert('舍友详细信息：\n\n' +
+                                  '床位：' + bed + '\n' +
+                                  '姓名：' + name + '\n' +
+                                  '学号：' + studentNo + '\n' +
+                                  '班级：' + className);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

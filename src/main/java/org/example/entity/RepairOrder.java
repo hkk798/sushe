@@ -16,7 +16,8 @@ public class RepairOrder {
     private Integer processorId;      // 处理人ID
     private Date processTime;         // 处理时间
     private String processResult;     // 处理结果
-    
+    private String images;
+
     // 关联的对象
     private Student student;
     private Room room;
@@ -168,6 +169,14 @@ public class RepairOrder {
     
     public boolean isCompleted() {
         return "completed".equals(status);
+    }
+
+    public String getImages() {
+        return images;
+    }
+
+    public void setImages(String images) {
+        this.images = images;
     }
     
     @Override

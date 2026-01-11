@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宿舍系统 - 学生主页</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        
+        /* 最上方蓝色背景标题栏 */
+        .top-header {
+            background-color: #1890ff;
+            color: white;
+            padding: 0 20px;
+            height: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .system-title {
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* 用户信息下拉菜单 */
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.3s;
+        }
+        
+        .dropdown-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: 160px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-radius: 4px;
+            z-index: 1000;
+            overflow: hidden;
+        }
+        
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .user-dropdown:hover .dropdown-content {
+            display: block;
+        }
+        
+        /* 欢迎区域 - 灰色背景 */
+        .welcome-section {
+            background-color: #f0f2f5;
+            padding: 30px 20px;
+            margin-bottom: 20px;
+        }
+        
+        .welcome-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .welcome-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1f1f1f;
+        }
+        
+        .student-info {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .date-info {
+            font-size: 16px;
+            color: #666;
+        }
+        
+        /* 主要内容区域 */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+        
+        .content-row {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        /* 我的宿舍卡片 */
+        .dorm-card {
+            flex: 2;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #1f1f1f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .info-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f1f1f;
+        }
+        
+        /* 快速操作卡片 */
+        .quick-actions-card {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            min-width: 300px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .action-btn {
+            background-color: #1890ff;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .action-btn:hover {
+            background-color: #096dd9;
+        }
+        
+        .action-btn.secondary {
+            background-color: #52c41a;
+        }
+        
+        .action-btn.secondary:hover {
+            background-color: #389e0d;
+        }
+        
+        /* 报修提醒 */
+        .repair-alert {
+            background-color: #fffbe6;
+            border: 1px solid #ffe58f;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .alert-icon {
+            color: #faad14;
+            font-size: 24px;
+        }
+        
+        .alert-content {
+            flex: 1;
+        }
+        
+        .alert-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #1f1f1f;
+        }
+        
+        .alert-text {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .content-row {
+                flex-direction: column;
+            }
+            
+            .dorm-card,
+            .quick-actions-card {
+                min-width: 100%;
+            }
+            
+            .nav-right {
+                gap: 10px;
+            }
+            
+            .nav-link {
+                padding: 6px 8px;
+                font-size: 14px;
+            }
+            
+            .dropdown-btn {
+                padding: 6px 10px;
+                font-size: 14px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .top-header {
+                padding: 0 10px;
+            }
+            
+            .system-title {
+                font-size: 20px;
+            }
+            
+            .welcome-title {
+                font-size: 24px;
+            }
+            
+            .student-info {
+                font-size: 16px;
+            }
+        }
+        .welcome-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .content-align-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 最上方蓝色背景标题栏 -->
+    <header class="top-header">
+        <div class="system-title">
+            🏠 宿舍系统
+        </div>
+        
+        <div class="nav-right">
+            <div class="nav-link">首页</div>
+            
+            <div class="user-dropdown">
+                <button class="dropdown-btn">
+                    个人信息 <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a href="/student_info">修改我的信息</a>
+                    <a href="/change_password">修改密码</a>
+                    <a href="/logout" onclick="return confirm('确定要退出登录吗？');">退出登录</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- 欢迎区域 - 灰色背景 -->
+    <section class="welcome-section">
+        <div class="welcome-container">
+            <div class="welcome-content">
+                <h1 class="welcome-title">
+                    欢迎你，
+                    <span class="student-name" 
+                        th:text="${student != null and student.user != null ? student.user.realName : '学生姓名'}">
+                        学生姓名
+                    </span>
+                    <span class="student-info" 
+                        th:text="${student != null ? ' (' + student.studentNo + ')' : ' (未知学号)'}">
+                        (20230001)
+                    </span>
+                </h1>
+                <div class="date-info" id="current-date">今天是2023年12月12日，祝你生活愉快！</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="content-align-container">
+        <div class="content-row">
+            <!-- 我的宿舍卡片 -->
+            <div class="dorm-card" th:if="${dormInfo != null}">
+                <h2 class="card-title">🏠 我的宿舍卡片</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">楼栋</div>
+                        <div class="info-value" 
+                            th:text="${dormInfo.buildingNo != null ? dormInfo.buildingNo + '楼' : '未知楼栋'}">
+                            西9楼
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">房间号</div>
+                        <div class="info-value" 
+                            th:text="${dormInfo.roomNumber != null ? dormInfo.roomNumber + '室' : '未知房间'}">
+                            101室
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">床位</div>
+                        <div class="info-value" 
+                            th:text="${dormInfo.bedNumber != null ? dormInfo.bedNumber + '号床' : '未知床位'}">
+                            01号床
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">住宿费标准</div>
+                        <div class="info-value" 
+                            th:text="${dormInfo.yearlyFee != null ? dormInfo.yearlyFee + '元/年' : '待定'}">
+                            1200元/年
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 无宿舍信息时的提示 -->
+            <div class="dorm-card" th:unless="${dormInfo != null}">
+                <h2 class="card-title">🏠 我的宿舍卡片</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">楼栋</div>
+                        <div class="info-value">暂无分配</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">房间号</div>
+                        <div class="info-value">暂无分配</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">床位</div>
+                        <div class="info-value">暂无分配</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">住宿费标准</div>
+                        <div class="info-value">暂无信息</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 快速操作卡片 -->
+            <div class="quick-actions-card">
+                <h2 class="card-title">⚡ 快速操作</h2>
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="location.href='/my_dorm'">
+                        <i class="fas fa-home"></i>
+                        我的宿舍
+                    </button>
+                    <button class="action-btn" onclick="location.href='/repair_submit'">
+                        <i class="fas fa-tools"></i>
+                        我要报修
+                    </button>
+                    <button class="action-btn secondary" onclick="location.href='/my_repairs'">
+                        <i class="fas fa-clipboard-list"></i>
+                        我的报修记录
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 报修提醒 -->
+        <div class="repair-alert" th:if="${pendingRepairsCount > 0}">
+            <i class="fas fa-exclamation-triangle alert-icon"></i>
+            <div class="alert-content">
+                <div class="alert-title">提醒：</div>
+                <div class="alert-text">
+                    您有 <span id="repair-count" 
+                            th:text="${pendingRepairsCount}">1</span> 个报修单正在处理中，请留意维修人员上门。
+                </div>
+            </div>
+        </div>
+        
+        <!-- 无报修提醒的情况 -->
+        <div class="repair-alert" th:unless="${pendingRepairsCount > 0}" style="background-color: #e6f7ff; border-color: #91d5ff;">
+            <i class="fas fa-check-circle alert-icon" style="color: #52c41a;"></i>
+            <div class="alert-content">
+                <div class="alert-title">提示：</div>
+                <div class="alert-text">当前没有待处理的报修单。</div>
+            </div>
+        </div>
+    </div>
+    </main>
+    
+    <script>
+        // 更新当前日期
+        function updateCurrentDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = (now.getMonth() + 1).toString().padStart(2, '0');
+            const day = now.getDate().toString().padStart(2, '0');
+            
+            const dateElement = document.getElementById('current-date');
+            dateElement.textContent = `今天是${year}年${month}月${day}日，祝你生活愉快！`;
+        }
+        
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 更新日期
+            updateCurrentDate();
+            
+            // 获取报修单数量（这里可以根据实际情况修改）
+            const repairCount = document.getElementById('repair-count').textContent;
+            if (parseInt(repairCount) > 0) {
+                // 如果有报修单，可以添加一些交互效果
+                const alertElement = document.querySelector('.repair-alert');
+                
+                // 添加闪烁效果提醒
+                setInterval(() => {
+                    alertElement.style.backgroundColor = alertElement.style.backgroundColor === '#fffbe6' ? '#fff3b0' : '#fffbe6';
+                }, 2000);
+            }
+            
+            // 添加按钮点击效果
+            const actionButtons = document.querySelectorAll('.action-btn');
+            actionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+            
+            // 处理退出登录确认
+            const logoutLink = document.querySelector('a[href="/logout"]');
+            if (logoutLink) {
+                logoutLink.addEventListener('click', function(e) {
+                    if (!confirm('确定要退出登录吗？')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        });
+        
+        // 动态数据绑定（使用Thymeleaf语法）
+        // 实际应用中，这些数据应该从后端传递
+        const studentData = {
+            name: '张三',
+            studentNo: '2021001',
+            dorm: {
+                building: '西9楼',
+                room: '101室',
+                bed: '01号床',
+                fee: '1200元/年'
+            },
+            processingRepairs: 1
+        };
+    </script>
+</body>
+</html>
