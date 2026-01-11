@@ -125,7 +125,7 @@ public class LoginController {
         
         // 根据角色跳转到不同页面
         if ("student".equals(role)) {
-            return "redirect:/student_index";
+            return "redirect:student/student_index";
         } else if ("building_admin".equals(role)) {
             return "redirect:/dorm_admin_index";
         } else if ("system_admin".equals(role)) {
