@@ -7,6 +7,7 @@ import org.example.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -108,38 +109,36 @@ public class UserService {
     /**
      * 注册用户
      */
-    public boolean register(User user, Student student, Admin admin) {
-        if (user == null || !StringUtils.hasText(user.getUsername()) || 
-            !StringUtils.hasText(user.getPassword()) || !StringUtils.hasText(user.getRole())) {
-            return false;
+    @Transactional(rollbackFor = Exception.class)
+    public boolean register(User user, Student student, Admin admin) { // 方法签名可以抛出异常，或者让运行时异常直接抛出
+        if (user == null || !StringUtils.hasText(user.getUsername()) ||
+                !StringUtils.hasText(user.getPassword()) || !StringUtils.hasText(user.getRole())) {
+            throw new IllegalArgumentException("用户信息不完整"); // 主动抛出异常
         }
-        
+
         // 检查用户名是否已存在
         if (userMapper.countByUsername(user.getUsername()) > 0) {
-            return false;
+            throw new RuntimeException("用户名已存在"); // 这里也可以抛异常，或者返回 false 都可以，因为这里还没写数据库
         }
-        
-        try {
-            // 保存用户基本信息
-            int result = userMapper.save(user);
-            if (result <= 0) {
-                return false;
-            }
-            
-            // 根据角色保存详细信息
-            if ("student".equals(user.getRole()) && student != null) {
-                student.setUserId(user.getUserId());
-                userMapper.saveStudent(student);
-            } else if (("building_admin".equals(user.getRole()) || "system_admin".equals(user.getRole())) && admin != null) {
-                admin.setUserId(user.getUserId());
-                userMapper.saveAdmin(admin);
-            }
-            
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+
+        // ！！！注意：下面不要用 try-catch 包裹，直接写逻辑！！！
+
+        // 1. 保存用户基本信息
+        int result = userMapper.save(user);
+        if (result <= 0) {
+            throw new RuntimeException("用户基本信息保存失败");
         }
+
+        // 2. 根据角色保存详细信息
+        if ("student".equals(user.getRole()) && student != null) {
+            student.setUserId(user.getUserId());
+            userMapper.saveStudent(student); // 如果这里报错，异常会向上抛出，触发 userMapper.save(user) 的回滚
+        } else if (("building_admin".equals(user.getRole()) || "system_admin".equals(user.getRole())) && admin != null) {
+            admin.setUserId(user.getUserId());
+            userMapper.saveAdmin(admin); // 同上，如果这里报错，自动回滚
+        }
+
+        return true;
     }
     
     /**
@@ -200,8 +199,8 @@ public class UserService {
     /**
      * 根据类型获取管理员
      */
-    public List<Admin> getAdminsByType(String adminType) {
-        return userMapper.findAdminsByType(adminType);
+    public List<Admin> getAdminsByRole(String role) {
+        return userMapper.findAdminsByRole(role);
     }
     
     /**

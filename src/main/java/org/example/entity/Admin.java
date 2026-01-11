@@ -7,7 +7,6 @@ public class Admin {
     private Integer adminId;
     private Integer userId;
     private String adminNo;
-    private String adminType;       // building, system
     private String position;        // 职位（长度100）
     private String workPhone;
     private String manageBuilding;
@@ -43,14 +42,7 @@ public class Admin {
     public void setAdminNo(String adminNo) {
         this.adminNo = adminNo;
     }
-    
-    public String getAdminType() {
-        return adminType;
-    }
-    
-    public void setAdminType(String adminType) {
-        this.adminType = adminType;
-    }
+
     
     public String getPosition() {
         return position;
@@ -83,22 +75,14 @@ public class Admin {
     public void setUser(User user) {
         this.user = user;
     }
-    
-    // 业务方法
-    public boolean isBuildingAdmin() {
-        return "building".equals(adminType);
-    }
-    
-    public boolean isSystemAdmin() {
-        return "system".equals(adminType);
-    }
-    
+
+
     @Override
     public String toString() {
         return "Admin{" +
                 "adminId=" + adminId +
                 ", adminNo='" + adminNo + '\'' +
-                ", adminType='" + adminType + '\'' +
+                // ", adminType='" + adminType + '\'' + // [已删除]
                 ", position='" + position + '\'' +
                 '}';
     }

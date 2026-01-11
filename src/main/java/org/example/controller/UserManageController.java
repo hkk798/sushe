@@ -47,6 +47,7 @@ public class UserManageController {
                           @RequestParam(required = false) String studentNo,
                           @RequestParam(required = false) String major,
                           @RequestParam(required = false) String className,
+                          @RequestParam(required = false) String gender, // [新增] 接收性别参数
                           // 管理员特有字段
                           @RequestParam(required = false) String adminNo,
                           @RequestParam(required = false) String position,
@@ -62,7 +63,7 @@ public class UserManageController {
             // 2. 构建 User 对象
             User user = new User();
             user.setUsername(username);
-            user.setPassword(password); // 实际生产中应加密
+            user.setPassword(password);
             user.setRealName(realName);
             user.setRole(role);
             user.setEmail(email);
@@ -73,19 +74,34 @@ public class UserManageController {
 
             // 3. 根据角色构建关联对象并调用 Service
             if ("student".equals(role)) {
+                // === [修改] 学生字段强制校验 ===
                 if (studentNo == null || studentNo.isEmpty()) {
                     model.addAttribute("errorMessage", "添加学生必须填写学号");
                     return "sys_admin/user_form";
                 }
+                // 强制校验专业
+                if (major == null || major.isEmpty()) {
+                    model.addAttribute("errorMessage", "添加学生必须填写专业");
+                    return "sys_admin/user_form";
+                }
+                // 强制校验班级
+                if (className == null || className.isEmpty()) {
+                    model.addAttribute("errorMessage", "添加学生必须填写班级");
+                    return "sys_admin/user_form";
+                }
+
                 Student student = new Student();
                 student.setStudentNo(studentNo);
                 student.setMajor(major);
                 student.setClassName(className);
-                student.setGender("M"); // 默认性别，实际表单应提供选择
+
+                // === [修改] 设置动态性别，如果没选默认给 'M' ===
+                student.setGender((gender != null && !gender.isEmpty()) ? gender : "M");
 
                 success = userService.register(user, student, null);
 
             } else if ("building_admin".equals(role) || "system_admin".equals(role)) {
+                // ... 管理员逻辑保持不变 ...
                 if (adminNo == null || adminNo.isEmpty()) {
                     model.addAttribute("errorMessage", "添加管理员必须填写工号");
                     return "sys_admin/user_form";
@@ -93,7 +109,8 @@ public class UserManageController {
                 Admin admin = new Admin();
                 admin.setAdminNo(adminNo);
                 admin.setPosition(position);
-                admin.setWorkPhone(phone); // 默认使用手机号作为工作电话
+                admin.setWorkPhone(phone);
+
 
                 success = userService.register(user, null, admin);
             }

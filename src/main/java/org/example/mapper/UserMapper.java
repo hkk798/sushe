@@ -147,7 +147,6 @@ public interface UserMapper {
         @Result(property = "adminId", column = "admin_id"),
         @Result(property = "userId", column = "user_id"),
         @Result(property = "adminNo", column = "admin_no"),
-        @Result(property = "adminType", column = "admin_type"),
         @Result(property = "position", column = "position"),
         @Result(property = "workPhone", column = "work_phone"),
         @Result(property = "manageBuilding", column = "manage_building"),
@@ -168,7 +167,6 @@ public interface UserMapper {
         @Result(property = "adminId", column = "admin_id"),
         @Result(property = "userId", column = "user_id"),
         @Result(property = "adminNo", column = "admin_no"),
-        @Result(property = "adminType", column = "admin_type"),
         @Result(property = "position", column = "position"),
         @Result(property = "workPhone", column = "work_phone"),
         @Result(property = "manageBuilding", column = "manage_building"),
@@ -187,8 +185,8 @@ public interface UserMapper {
     Admin findAdminByUserId(@Param("userId") Integer userId);
     
     // 插入管理员信息
-    @Insert("INSERT INTO Admin(user_id, admin_no, admin_type, position, work_phone, manage_building) " +
-            "VALUES(#{userId}, #{adminNo}, #{adminType}, #{position}, #{workPhone}, #{manageBuilding})")
+    @Insert("INSERT INTO Admin(user_id, admin_no, position, work_phone, manage_building) " +
+            "VALUES(#{userId}, #{adminNo}, #{position}, #{workPhone}, #{manageBuilding})")
     int saveAdmin(Admin admin);
     
     // 获取所有管理员
@@ -197,7 +195,6 @@ public interface UserMapper {
         @Result(property = "adminId", column = "admin_id"),
         @Result(property = "userId", column = "user_id"),
         @Result(property = "adminNo", column = "admin_no"),
-        @Result(property = "adminType", column = "admin_type"),
         @Result(property = "position", column = "position"),
         @Result(property = "workPhone", column = "work_phone"),
         @Result(property = "manageBuilding", column = "manage_building"),
@@ -209,19 +206,19 @@ public interface UserMapper {
     List<Admin> findAllAdmins();
     
     // 根据类型获取管理员
-    @Select("SELECT a.*, u.* FROM Admin a JOIN User u ON a.user_id = u.user_id WHERE a.admin_type = #{adminType}")
+    @Select("SELECT a.*, u.* FROM Admin a JOIN User u ON a.user_id = u.user_id WHERE u.role = #{role}")
     @Results({
-        @Result(property = "adminId", column = "admin_id"),
-        @Result(property = "userId", column = "user_id"),
-        @Result(property = "adminNo", column = "admin_no"),
-        @Result(property = "adminType", column = "admin_type"),
-        @Result(property = "position", column = "position"),
-        @Result(property = "workPhone", column = "work_phone"),
-        @Result(property = "manageBuilding", column = "manage_building"),
-        @Result(property = "user.userId", column = "user_id"),
-        @Result(property = "user.realName", column = "real_name")
+            @Result(property = "adminId", column = "admin_id"),
+            @Result(property = "userId", column = "user_id"),
+            @Result(property = "adminNo", column = "admin_no"),
+            // @Result(property = "adminType", column = "admin_type"), // [已删除]
+            @Result(property = "position", column = "position"),
+            @Result(property = "workPhone", column = "work_phone"),
+            @Result(property = "manageBuilding", column = "manage_building"),
+            @Result(property = "user.userId", column = "user_id"),
+            @Result(property = "user.realName", column = "real_name")
     })
-    List<Admin> findAdminsByType(@Param("adminType") String adminType);
+    List<Admin> findAdminsByRole(@Param("role") String role);
 
 
     // 在 UserMapper 接口中添加
