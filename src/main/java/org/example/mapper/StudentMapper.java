@@ -137,6 +137,11 @@ public interface StudentMapper {
     })
     List<AllocationRecord> findDormHistory(@Param("studentId") Integer studentId);
 
+
+
+    @Select("SELECT COUNT(*) FROM Student s " +
+            "WHERE NOT EXISTS (SELECT 1 FROM AllocationRecord ar WHERE ar.student_id = s.student_id AND ar.status = 'active')")
+    int countUnassignedStudents();
 }
 
 
