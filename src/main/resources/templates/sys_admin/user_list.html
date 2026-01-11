@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>用户管理 - 系统管理员</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .status-active { color: #28a745; font-weight: bold; }
+        .status-inactive { color: #dc3545; font-weight: bold; }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-primary mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/sys_admin_index"><i class="fas fa-home me-2"></i>宿舍管理系统</a>
+        <div class="d-flex">
+            <span class="text-white me-3 align-self-center">欢迎, 系统管理员</span>
+            <a href="/logout" class="btn btn-outline-light btn-sm">退出</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2">
+            <div class="list-group">
+                <a href="/sys_admin_index" class="list-group-item list-group-item-action">
+                    <i class="fas fa-tachometer-alt me-2"></i>仪表盘
+                </a>
+                <a href="/admin/user/list" class="list-group-item list-group-item-action active">
+                    <i class="fas fa-users me-2"></i>用户管理
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-primary"><i class="fas fa-list me-2"></i>用户列表</h5>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#importModal">
+                            <i class="fas fa-file-import me-1"></i> 批量导入
+                        </button>
+                        <a href="/admin/user/add" class="btn btn-success btn-sm">
+                            <i class="fas fa-plus me-1"></i> 添加新用户
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <form action="/admin/user/list" method="get" class="row g-3 mb-4 border-bottom pb-4">
+
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">角色筛选</label>
+                            <select name="role" class="form-select">
+                                <option value="">-- 全部 --</option>
+                                <option value="student" th:selected="${searchRole == 'student'}">学生</option>
+                                <option value="building_admin" th:selected="${searchRole == 'building_admin'}">宿管</option>
+                                <option value="system_admin" th:selected="${searchRole == 'system_admin'}">管理员</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">专业 (仅学生)</label>
+                            <input type="text" name="major" class="form-control" placeholder="输入专业" th:value="${searchMajor}">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">班级 (仅学生)</label>
+                            <input type="text" name="className" class="form-control" placeholder="输入班级" th:value="${searchClassName}">
+                        </div>
+
+                        <div class="col-md-4 d-flex align-items-end gap-2">
+                            <button type="submit" class="btn btn-primary flex-grow-1">
+                                <i class="fas fa-search"></i> 搜索
+                            </button>
+                            <a href="/admin/user/list" class="btn btn-outline-secondary" title="重置条件">
+                                <i class="fas fa-sync-alt"></i>
+                            </a>
+                            <a href="/sys_admin_index" class="btn btn-secondary">
+                                <i class="fas fa-home me-1"></i> 返回首页
+                            </a>
+                        </div>
+                    </form>
+
+                    <div th:if="${msg}" class="alert alert-info alert-dismissible fade show" role="alert">
+                        <span th:if="${msg == 'userAdded'}">用户添加成功！</span>
+                        <span th:if="${msg == 'deleted'}">用户状态已更新（禁用）！</span>
+
+                        <span th:if="${msg != 'userAdded' && msg != 'deleted'}" th:text="${msg}"></span>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped align-middle">
+                            <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>用户名</th>
+                                <th>真实姓名</th>
+                                <th>专业</th>
+                                <th>班级</th>
+                                <th>角色</th>
+                                <th>电话</th>
+                                <th>邮箱</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="user : ${users}">
+                                <td th:text="${user.userId}">1</td>
+                                <td th:text="${user.username}">admin</td>
+                                <td th:text="${user.realName}">张三</td>
+                                <td th:text="${user.major != null ? user.major : '-'}"></td>
+                                <td th:text="${user.className != null ? user.className : '-'}"></td>
+
+                                <td>
+                                    <span th:if="${user.role == 'student'}" class="badge bg-info">学生</span>
+                                    <span th:if="${user.role == 'building_admin'}" class="badge bg-warning text-dark">宿管</span>
+                                    <span th:if="${user.role == 'system_admin'}" class="badge bg-danger">管理员</span>
+                                </td>
+
+                                <td th:text="${user.phone}">13800000000</td>
+                                <td th:text="${user.email}">test@example.com</td>
+
+                                <td>
+                                    <span th:if="${user.status == 'active'}" class="status-active"><i class="fas fa-check-circle"></i> 正常</span>
+                                    <span th:if="${user.status != 'active'}" class="status-inactive"><i class="fas fa-ban"></i> 禁用</span>
+                                </td>
+
+                                <td>
+                                    <a href="#" class="btn btn-sm btn-outline-primary me-1" title="编辑">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a th:href="@{/admin/user/delete/{id}(id=${user.userId})}"
+                                       onclick="return confirm('确定要禁用该用户吗？');"
+                                       class="btn btn-sm btn-outline-danger" title="禁用">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(users)}">
+                                <td colspan="10" class="text-center py-4 text-muted">暂无用户数据</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="importModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">批量导入用户</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/admin/user/import" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">选择 Excel 文件 (.xlsx)</label>
+                        <input type="file" name="file" class="form-control" accept=".xlsx, .xls" required>
+                    </div>
+                    <div class="alert alert-secondary small">
+                        <strong>Excel表头要求：</strong><br>
+                        第一行必须包含：用户名*, 密码*, 真实姓名*, 角色*, 学号, 专业, 班级...<br>
+                        <span class="text-danger">* 为必填项</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">开始导入</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

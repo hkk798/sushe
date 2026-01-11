@@ -14,6 +14,10 @@ public class User {
     private String phone;
     private String status;       
     private Date createdAt;
+
+
+    private String major;     // 专业
+    private String className; // 班级
     
     // 无参构造
     public User() {
@@ -129,5 +133,23 @@ public class User {
                 ", realName='" + realName + '\'' +
                 ", status='" + status + '\'' +
                 '}';
+    }
+
+
+
+    public String getMajor() {
+        return major;
+    }
+
+    public void setMajor(String major) {
+        this.major = major;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
     }
 }

@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
+import org.example.vo.UserImportVO; // 新增
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -309,4 +311,79 @@ public class UserService {
         int count = userMapper.countByUsername(username);
         return count > 0;
     }
+
+    public List<User> searchUsers(String role, String major, String className) {
+        return userMapper.searchUsers(role, major, className);
+    }
+
+    /**
+     * [新增] 批量导入用户
+     * @return 返回导入结果信息（例如：成功10条，失败2条）
+     */
+    @Transactional // 开启事务，虽然我们是逐条插入，但建议保持一致性
+    public String importUsers(List<UserImportVO> list) {
+        int successCount = 0;
+        int failCount = 0;
+        StringBuilder failReason = new StringBuilder();
+
+        for (int i = 0; i < list.size(); i++) {
+            UserImportVO vo = list.get(i);
+            try {
+                // 1. 基础数据校验
+                if (vo.getUsername() == null || vo.getPassword() == null || vo.getRole() == null) {
+                    throw new RuntimeException("必填项缺失");
+                }
+
+                // 2. 构建 User 对象
+                User user = new User();
+                user.setUsername(vo.getUsername());
+                user.setPassword(vo.getPassword());
+                user.setRealName(vo.getRealName());
+                user.setRole(vo.getRole());
+                user.setPhone(vo.getPhone());
+                user.setEmail(vo.getEmail());
+                user.setStatus("active");
+
+                // 3. 根据角色构建 Student 或 Admin
+                Student student = null;
+                Admin admin = null;
+
+                if ("student".equals(vo.getRole())) {
+                    student = new Student();
+                    student.setStudentNo(vo.getStudentNo());
+                    student.setMajor(vo.getMajor());
+                    student.setClassName(vo.getClassName());
+                    student.setGender(vo.getGender() != null ? vo.getGender() : "M");
+
+                    // 简单校验
+                    if (student.getStudentNo() == null) throw new RuntimeException("学生缺少学号");
+
+                } else if ("building_admin".equals(vo.getRole()) || "system_admin".equals(vo.getRole())) {
+                    admin = new Admin();
+                    admin.setAdminNo(vo.getAdminNo());
+                    admin.setPosition(vo.getPosition());
+                    admin.setWorkPhone(vo.getPhone());
+
+                    // 简单校验
+                    if (admin.getAdminNo() == null) throw new RuntimeException("管理员缺少工号");
+                }
+
+                // 4. 调用注册方法
+                boolean result = register(user, student, admin);
+                if (result) {
+                    successCount++;
+                } else {
+                    failCount++;
+                    failReason.append("第").append(i + 2).append("行保存失败(可能用户名已存在); ");
+                }
+
+            } catch (Exception e) {
+                failCount++;
+                failReason.append("第").append(i + 2).append("行错误:").append(e.getMessage()).append("; ");
+            }
+        }
+
+        return "导入完成！成功: " + successCount + " 条, 失败: " + failCount + " 条。 " + (failCount > 0 ? "详情: " + failReason.toString() : "");
+    }
+
 }

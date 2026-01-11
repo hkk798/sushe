@@ -12,6 +12,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable; // 新增
+import java.util.List; // 新增
+import com.alibaba.excel.EasyExcel;
+import org.springframework.web.multipart.MultipartFile;
+import org.example.vo.UserImportVO;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Controller
 @RequestMapping("/admin/user")
@@ -126,6 +133,75 @@ public class UserManageController {
             e.printStackTrace();
             model.addAttribute("errorMessage", "系统错误: " + e.getMessage());
             return "sys_admin/user_form";
+        }
+    }
+
+
+    @GetMapping("/list")
+    public String listUsers(@RequestParam(required = false) String role,
+                            @RequestParam(required = false) String major,
+                            @RequestParam(required = false) String className,
+                            @RequestParam(required = false) String msg, // [1] 新增：接收消息参数
+                            Model model, HttpSession session) {
+
+        // 1. 权限校验
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null || !"system_admin".equals(currentUser.getRole())) {
+            return "redirect:/login";
+        }
+
+        // 2. 搜索逻辑
+        List<User> users = userService.searchUsers(role, major, className);
+        model.addAttribute("users", users);
+
+        // 3. 回显搜索条件
+        model.addAttribute("searchRole", role);
+        model.addAttribute("searchMajor", major);
+        model.addAttribute("searchClassName", className);
+
+        // [2] 新增：如果有消息，存入 model 传给前端
+        // Spring 已经自动把 "%E6%88%90%E5%8A%9F" 解码成了 "成功"
+        if (msg != null && !msg.isEmpty()) {
+            model.addAttribute("msg", msg);
+        }
+
+        return "sys_admin/user_list";
+    }
+
+    @GetMapping("/delete/{userId}")
+    public String deleteUser(@PathVariable Integer userId, HttpSession session) {
+        // 1. 权限校验
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null || !"system_admin".equals(currentUser.getRole())) {
+            return "redirect:/login";
+        }
+
+        // 2. 执行删除 (这里假设 UserService 有 updateStatus 方法来实现软删除，或者你需要添加物理删除)
+        // 建议使用状态更新为 'inactive' 而不是直接物理删除
+        userService.updateUserStatus(userId, "inactive");
+
+        return "redirect:/admin/user/list?msg=deleted";
+    }
+
+
+    @PostMapping("/import")
+    public String importUserFile(@RequestParam("file") MultipartFile file, Model model) {
+        try {
+            // 1. 使用 EasyExcel 同步读取所有数据（适合数据量几千条以内的场景）
+            List<UserImportVO> list = EasyExcel.read(file.getInputStream())
+                    .head(UserImportVO.class)
+                    .sheet()
+                    .doReadSync();
+
+            // 2. 调用 Service 处理
+            String resultMsg = userService.importUsers(list);
+
+            // 3. 返回结果 (这里使用 URLEncoder 防止中文乱码导致 URL 报错)
+            return "redirect:/admin/user/list?msg=" + URLEncoder.encode(resultMsg, StandardCharsets.UTF_8);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/admin/user/list?error=true&msg=" + URLEncoder.encode("文件解析失败: " + e.getMessage(), StandardCharsets.UTF_8);
         }
     }
 }

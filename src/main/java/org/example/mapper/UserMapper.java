@@ -224,4 +224,18 @@ public interface UserMapper {
     // 在 UserMapper 接口中添加
     @Select("SELECT COUNT(*) FROM User")
     int countAll();
+
+    @Select("<script>" +
+            "SELECT u.*, s.major, s.class_name " +  // <--- 修改点：多查了两个字段
+            "FROM User u " +
+            "LEFT JOIN Student s ON u.user_id = s.user_id " +
+            "WHERE 1=1 " +
+            "<if test='role != null and role != \"\"'> AND u.role = #{role} </if> " +
+            "<if test='major != null and major != \"\"'> AND s.major LIKE CONCAT('%', #{major}, '%') </if> " +
+            "<if test='className != null and className != \"\"'> AND s.class_name LIKE CONCAT('%', #{className}, '%') </if> " +
+            "ORDER BY u.created_at DESC" +
+            "</script>")
+    List<User> searchUsers(@Param("role") String role,
+                           @Param("major") String major,
+                           @Param("className") String className);
 }
