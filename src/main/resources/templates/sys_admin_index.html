@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #212529; /* 系统管理员使用深色调 */
+            --primary-color: #212529;
             --secondary-color: #343a40;
             --accent-color: #0d6efd;
             --light-color: #f8f9fa;
@@ -19,7 +19,6 @@
             font-family: 'Microsoft YaHei', sans-serif;
         }
 
-        /* 9.2.1 系统首页导航界面 */
         .navbar {
             background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
             color: white;
@@ -32,7 +31,6 @@
             color: white !important;
         }
 
-        /* 统计卡片样式 (9.2.5.2 全局统计) */
         .stat-card {
             background: white;
             border-radius: 10px;
@@ -72,7 +70,6 @@
             font-size: 14px;
         }
 
-        /* 快捷操作区 (9.2.5.2 快速用户操作) */
         .action-card {
             background: white;
             border-radius: 10px;
@@ -107,7 +104,6 @@
             margin-bottom: 10px;
         }
 
-        /* 日志表格 (9.2.5.2 关键操作日志) */
         .log-table th {
             background-color: #f8f9fa;
             border-bottom: 2px solid #dee2e6;
@@ -202,7 +198,7 @@
             <div class="action-card">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="card-title mb-0"><i class="fas fa-history me-2 text-info"></i>近期关键日志</h5>
-                    <a href="#" class="btn btn-sm btn-link text-decoration-none">查看全部</a>
+                    <a href="/admin/system_log" class="btn btn-sm btn-link text-decoration-none">查看全部</a>
                 </div>
                 <div class="table-responsive">
                     <table class="table log-table table-hover">
@@ -215,10 +211,11 @@
                         </thead>
                         <tbody>
                         <tr th:each="log : ${systemLogs}">
-                            <td th:text="${log.time}" class="text-muted">2023-01-01</td>
+                            <td th:text="${#temporals.format(log.createTime, 'yyyy-MM-dd HH:mm')}" class="text-muted">2023-01-01</td>
                             <td><span class="badge bg-secondary" th:text="${log.operator}">Admin</span></td>
-                            <td th:text="${log.action}">System Action</td>
+                            <td th:text="${log.action + ' - ' + (log.detail != null ? log.detail : '')}">System Action</td>
                         </tr>
+
                         <tr th:if="${#lists.isEmpty(systemLogs)}">
                             <td colspan="3" class="text-center text-muted py-3">暂无日志记录</td>
                         </tr>
@@ -238,7 +235,7 @@
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                         系统版本
-                        <span class="text-muted">v0.0.1</span>
+                        <span class="text-muted">v1.0.0</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                         服务器时间
