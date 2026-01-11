@@ -139,9 +139,10 @@ public class UserManageController {
 
     @GetMapping("/list")
     public String listUsers(@RequestParam(required = false) String role,
+                            @RequestParam(required = false) String studentNo, // [新增参数]
                             @RequestParam(required = false) String major,
                             @RequestParam(required = false) String className,
-                            @RequestParam(required = false) String msg, // [1] 新增：接收消息参数
+                            @RequestParam(required = false) String msg,
                             Model model, HttpSession session) {
 
         // 1. 权限校验
@@ -150,17 +151,17 @@ public class UserManageController {
             return "redirect:/login";
         }
 
-        // 2. 搜索逻辑
-        List<User> users = userService.searchUsers(role, major, className);
+        // 2. 搜索逻辑 (传入 studentNo)
+        List<User> users = userService.searchUsers(role, studentNo, major, className);
         model.addAttribute("users", users);
 
         // 3. 回显搜索条件
         model.addAttribute("searchRole", role);
+        model.addAttribute("searchStudentNo", studentNo); // [新增回显]
         model.addAttribute("searchMajor", major);
         model.addAttribute("searchClassName", className);
 
-        // [2] 新增：如果有消息，存入 model 传给前端
-        // Spring 已经自动把 "%E6%88%90%E5%8A%9F" 解码成了 "成功"
+        // 4. 消息处理
         if (msg != null && !msg.isEmpty()) {
             model.addAttribute("msg", msg);
         }
@@ -203,5 +204,21 @@ public class UserManageController {
             e.printStackTrace();
             return "redirect:/admin/user/list?error=true&msg=" + URLEncoder.encode("文件解析失败: " + e.getMessage(), StandardCharsets.UTF_8);
         }
+    }
+
+
+    @GetMapping("/restore/{userId}")
+    public String restoreUser(@PathVariable Integer userId, HttpSession session) {
+        // 1. 权限校验
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null || !"system_admin".equals(currentUser.getRole())) {
+            return "redirect:/login";
+        }
+
+        // 2. 执行恢复 (将状态改为 active)
+        userService.updateUserStatus(userId, "active");
+
+        // 3. 返回提示
+        return "redirect:/admin/user/list?msg=" + URLEncoder.encode("用户权限已恢复！", StandardCharsets.UTF_8);
     }
 }

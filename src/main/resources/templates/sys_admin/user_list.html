@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .status-active { color: #28a745; font-weight: bold; }
-        .status-inactive { color: #dc3545; font-weight: bold; }
+        .status-inactive { color: #6c757d; font-weight: bold; } /* 禁用状态改用灰色更直观 */
     </style>
 </head>
 <body class="bg-light">
@@ -53,7 +53,7 @@
                     <form action="/admin/user/list" method="get" class="row g-3 mb-4 border-bottom pb-4">
 
                         <div class="col-md-2">
-                            <label class="form-label fw-bold">角色筛选</label>
+                            <label class="form-label fw-bold">角色</label>
                             <select name="role" class="form-select">
                                 <option value="">-- 全部 --</option>
                                 <option value="student" th:selected="${searchRole == 'student'}">学生</option>
@@ -62,13 +62,18 @@
                             </select>
                         </div>
 
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold">专业 (仅学生)</label>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">学号</label>
+                            <input type="text" name="studentNo" class="form-control" placeholder="输入学号" th:value="${searchStudentNo}">
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">专业</label>
                             <input type="text" name="major" class="form-control" placeholder="输入专业" th:value="${searchMajor}">
                         </div>
 
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold">班级 (仅学生)</label>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">班级</label>
                             <input type="text" name="className" class="form-control" placeholder="输入班级" th:value="${searchClassName}">
                         </div>
 
@@ -80,7 +85,7 @@
                                 <i class="fas fa-sync-alt"></i>
                             </a>
                             <a href="/sys_admin_index" class="btn btn-secondary">
-                                <i class="fas fa-home me-1"></i> 返回首页
+                                <i class="fas fa-home me-1"></i> 首页
                             </a>
                         </div>
                     </form>
@@ -88,9 +93,7 @@
                     <div th:if="${msg}" class="alert alert-info alert-dismissible fade show" role="alert">
                         <span th:if="${msg == 'userAdded'}">用户添加成功！</span>
                         <span th:if="${msg == 'deleted'}">用户状态已更新（禁用）！</span>
-
                         <span th:if="${msg != 'userAdded' && msg != 'deleted'}" th:text="${msg}"></span>
-
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
 
@@ -101,7 +104,7 @@
                                 <th>ID</th>
                                 <th>用户名</th>
                                 <th>真实姓名</th>
-                                <th>专业</th>
+                                <th>学号</th> <th>专业</th>
                                 <th>班级</th>
                                 <th>角色</th>
                                 <th>电话</th>
@@ -115,6 +118,8 @@
                                 <td th:text="${user.userId}">1</td>
                                 <td th:text="${user.username}">admin</td>
                                 <td th:text="${user.realName}">张三</td>
+
+                                <td th:text="${user.studentNo != null ? user.studentNo : '-'}"></td>
                                 <td th:text="${user.major != null ? user.major : '-'}"></td>
                                 <td th:text="${user.className != null ? user.className : '-'}"></td>
 
@@ -136,15 +141,24 @@
                                     <a href="#" class="btn btn-sm btn-outline-primary me-1" title="编辑">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a th:href="@{/admin/user/delete/{id}(id=${user.userId})}"
-                                       onclick="return confirm('确定要禁用该用户吗？');"
-                                       class="btn btn-sm btn-outline-danger" title="禁用">
-                                        <i class="fas fa-trash-alt"></i>
+
+                                    <a th:if="${user.status == 'active'}"
+                                       th:href="@{/admin/user/delete/{id}(id=${user.userId})}"
+                                       onclick="return confirm('确定要禁用该用户吗？\n禁用后该用户将无法登录。');"
+                                       class="btn btn-sm btn-outline-danger" title="禁用账号">
+                                        <i class="fas fa-ban"></i>
+                                    </a>
+
+                                    <a th:if="${user.status != 'active'}"
+                                       th:href="@{/admin/user/restore/{id}(id=${user.userId})}"
+                                       onclick="return confirm('确定要恢复该用户的登录权限吗？');"
+                                       class="btn btn-sm btn-outline-success" title="恢复权限">
+                                        <i class="fas fa-check-circle"></i>
                                     </a>
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(users)}">
-                                <td colspan="10" class="text-center py-4 text-muted">暂无用户数据</td>
+                                <td colspan="11" class="text-center py-4 text-muted">暂无用户数据</td>
                             </tr>
                             </tbody>
                         </table>

@@ -26,52 +26,55 @@ public class UserService {
      */
     public Map<String, Object> login(String username, String password, String role) {
         Map<String, Object> result = new HashMap<>();
-        
+
         if (!StringUtils.hasText(username) || !StringUtils.hasText(password) || !StringUtils.hasText(role)) {
             return null;
         }
-        
+
         User user = null;
 
-        // 根据角色采用不同的查找策略
+        // 1. 初步查询 (为了获取 user_id 和密码)
         if ("student".equals(role)) {
-            // 对于学生：使用学号查找对应的学生，再获取其用户信息
-            Student student = userMapper.findStudentByStudentNo(username); // username实际上是学号
+            Student student = userMapper.findStudentByStudentNo(username);
             if (student != null && student.getUser() != null) {
                 user = student.getUser();
-                // 验证密码
-                if (!password.equals(user.getPassword())) {
-                    return null;
-                }
             }
         } else {
-            // 对于管理员：直接使用用户名+密码查找
             Admin admin = userMapper.findAdminByAdminNo(username);
             if (admin != null && admin.getUser() != null) {
                 user = admin.getUser();
-                if (!password.equals(user.getPassword())) {
-                    return null;
-                }
             }
         }
-        
+
+        // 2. 账号不存在检查
         if (user == null) {
             return null;
         }
-        
-        // 验证角色匹配
+
+        // === [关键修复] ===
+        // 为了防止 JOIN 查询导致 status 字段不准确，这里用 userId 单独查一次 User 主表
+        // 这一步能 100% 确保拿到最新的 status (active/inactive)
+        user = userMapper.findById(user.getUserId());
+
+        // 3. 密码验证
+        if (!password.equals(user.getPassword())) {
+            return null;
+        }
+
+        // 4. 角色匹配验证
         if (!role.equals(user.getRole())) {
             return null;
         }
-        
-        // 验证用户状态
+
+        // 5. 状态验证 (此时 user.getStatus() 绝对准确)
         if (!"active".equals(user.getStatus())) {
+            // 这里可以抛出异常提示 "账号已禁用"，或者直接返回 null
             return null;
         }
-        
+
+        // 6. 组装返回结果
         result.put("user", user);
-        
-        // 根据角色获取详细信息
+
         if ("student".equals(role)) {
             Student student = userMapper.findStudentByUserId(user.getUserId());
             result.put("student", student);
@@ -79,7 +82,7 @@ public class UserService {
             Admin admin = userMapper.findAdminByUserId(user.getUserId());
             result.put("admin", admin);
         }
-        
+
         return result;
     }
     
@@ -312,8 +315,9 @@ public class UserService {
         return count > 0;
     }
 
-    public List<User> searchUsers(String role, String major, String className) {
-        return userMapper.searchUsers(role, major, className);
+    public List<User> searchUsers(String role, String studentNo, String major, String className) {
+        // 透传 studentNo 参数
+        return userMapper.searchUsers(role, studentNo, major, className);
     }
 
     /**

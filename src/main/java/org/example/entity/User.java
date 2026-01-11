@@ -18,6 +18,7 @@ public class User {
 
     private String major;     // 专业
     private String className; // 班级
+    private String studentNo;
     
     // 无参构造
     public User() {
@@ -151,5 +152,13 @@ public class User {
 
     public void setClassName(String className) {
         this.className = className;
+    }
+
+    public String getStudentNo() {
+        return studentNo;
+    }
+
+    public void setStudentNo(String studentNo) {
+        this.studentNo = studentNo;
     }
 }
