@@ -335,257 +335,326 @@
     </style>
 </head>
 <body>
-    <div class="repair-card">
-        <!-- 第一部分：标题 -->
-        <h1 class="main-title">提交报修申请</h1>
-        
-        <!-- 消息提示 -->
-        <div th:if="${errorMessage}" class="alert alert-danger">
-            <span th:text="${errorMessage}"></span>
-        </div>
-        
-        <!-- 报修表单 -->
-        <form th:action="@{/repair_submit}" method="post" enctype="multipart/form-data" id="repairForm">
-            <!-- 第二部分：报修信息 -->
-            
-            <!-- 第一行：报修位置 -->
-            <div class="form-row">
-                <label class="form-label">报修位置：</label>
-                <div class="readonly-info" th:text="${repairLocation}">
-                    西9楼-101室
-                </div>
-            </div>
-            
-            <!-- 第二行：报修类别 -->
-            <div class="form-row">
-                <label class="form-label">报修类别：</label>
-                <select name="category" class="form-select" required>
-                    <option value="">请选择报修类别</option>
-                    <option th:each="category : ${repairCategories}" 
-                            th:value="${category}"
-                            th:text="${category}"
-                            th:selected="${category == param.category}">
-                    </option>
-                </select>
-            </div>
-            
-            <!-- 第三行：问题描述（可选） -->
-            <div class="form-row" style="align-items: flex-start;">
-                <label class="form-label">问题描述：</label>
-                <textarea name="description" class="form-textarea" 
-                          placeholder="请详细描述故障现象..."
-                          th:text="${param.description}"
-                          maxlength="500"
-                          oninput="updateCharCount(this)"></textarea>
-            </div>
-            <div class="char-count" id="charCount">0/500</div>
-            
-            <!-- 第四行：上传图片 -->
-            <div class="form-row">
-                <label class="form-label">上传图片：</label>
-                <div class="file-upload-wrapper">
-                    <div class="file-input-container">
-                        <!-- 左边：选择文件按钮框 -->
-                        <div class="file-select-box">
-                            <button type="button" class="file-select-btn" onclick="document.getElementById('fileInput').click()">
-                                选择文件
-                            </button>
-                            <input type="file" id="fileInput" name="images" 
-                                   class="file-input-hidden" 
-                                   accept="image/jpeg,image/png,image/gif" multiple
-                                   onchange="handleFileSelect(this)">
-                        </div>
-                        
-                        <!-- 右边：显示文件名框 -->
-                        <div class="file-display-box" id="fileDisplay">
-                            <span class="file-placeholder" id="filePlaceholder">未选择文件</span>
-                        </div>
-                    </div>
-                    <div class="file-hint">最多上传3张图片（每张不超过5MB）</div>
-                </div>
-            </div>
-            
-            <!-- 第三部分：按钮组 -->
-            <div class="button-group">
-                <button type="submit" class="btn-submit">提交申请</button>
-                <button type="button" class="btn-back" onclick="history.back()">返回</button>
-                </button>
-            </div>
-        </form>
+<div class="repair-card">
+    <!-- 第一部分：标题 -->
+    <h1 class="main-title">提交报修申请</h1>
+
+    <!-- 消息提示 -->
+    <div th:if="${errorMessage}" class="alert alert-danger">
+        <span th:text="${errorMessage}"></span>
     </div>
 
-    <script>
-        // 存储已选择的文件
-        let selectedFiles = [];
-        
-        // 更新字符计数
-        function updateCharCount(textarea) {
-            const charCount = document.getElementById('charCount');
-            const length = textarea.value.length;
-            charCount.textContent = length + '/500';
-            
-            if (length > 450) {
-                charCount.className = 'char-count warning';
-            } else if (length > 500) {
-                charCount.className = 'char-count error';
-            } else {
-                charCount.className = 'char-count';
-            }
+    <!-- 报修表单 -->
+    <form th:action="@{/repair_submit}" method="post" enctype="multipart/form-data" id="repairForm">
+        <!-- 第二部分：报修信息 -->
+
+        <!-- 第一行：报修位置 -->
+        <div class="form-row">
+            <label class="form-label">报修位置：</label>
+            <div class="readonly-info" th:text="${repairLocation}">
+                西9楼-101室
+            </div>
+        </div>
+
+        <!-- 第二行：报修类别 -->
+        <div class="form-row">
+            <label class="form-label">报修类别：</label>
+            <select name="category" class="form-select" required>
+                <option value="">请选择报修类别</option>
+                <option th:each="category : ${repairCategories}"
+                        th:value="${category}"
+                        th:text="${category}"
+                        th:selected="${category == param.category}">
+                </option>
+            </select>
+        </div>
+
+        <!-- 第三行：问题描述（可选） -->
+        <div class="form-row" style="align-items: flex-start;">
+            <label class="form-label">问题描述：</label>
+            <textarea name="description" class="form-textarea"
+                      placeholder="请详细描述故障现象..."
+                      th:text="${param.description}"
+                      maxlength="500"
+                      oninput="updateCharCount(this)"></textarea>
+        </div>
+        <div class="char-count" id="charCount">0/500</div>
+
+        <!-- 第四行：上传图片 -->
+        <div class="form-row">
+            <label class="form-label">上传图片：</label>
+            <div class="file-upload-wrapper">
+                <div class="file-input-container">
+                    <!-- 左边：选择文件按钮框 -->
+                    <div class="file-select-box">
+                        <button type="button" class="file-select-btn" onclick="document.getElementById('fileInput').click()">
+                            选择文件
+                        </button>
+                        <input type="file" id="fileInput" name="images"
+                               class="file-input-hidden"
+                               accept="image/jpeg,image/png,image/gif" multiple
+                               onchange="handleFileSelect(this)">
+                    </div>
+
+                    <!-- 右边：显示文件名框 -->
+                    <div class="file-display-box" id="fileDisplay">
+                        <span class="file-placeholder" id="filePlaceholder">未选择文件</span>
+                    </div>
+                </div>
+                <div class="file-hint">最多上传3张图片（每张不超过5MB）</div>
+            </div>
+        </div>
+
+        <!-- 第三部分：按钮组 -->
+        <div class="button-group">
+            <button type="submit" class="btn-submit">提交申请</button>
+            <button type="button" class="btn-back" onclick="window.location.href='/student/student_index'">
+                返回
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // 存储已选择的文件
+    let selectedFiles = [];
+
+    // 更新字符计数
+    function updateCharCount(textarea) {
+        const charCount = document.getElementById('charCount');
+        const length = textarea.value.length;
+        charCount.textContent = length + '/500';
+
+        if (length > 450) {
+            charCount.className = 'char-count warning';
+        } else if (length > 500) {
+            charCount.className = 'char-count error';
+        } else {
+            charCount.className = 'char-count';
         }
-        
-        // 处理文件选择
-        function handleFileSelect(input) {
-            if (!input.files || input.files.length === 0) return;
-            
-            const newFiles = Array.from(input.files);
-            
-            // 检查总数是否超过3个
-            if (selectedFiles.length + newFiles.length > 3) {
-                alert(`最多只能选择3个文件，当前已选择${selectedFiles.length}个`);
+    }
+
+    // 处理文件选择
+    function handleFileSelect(input) {
+        if (!input.files || input.files.length === 0) return;
+
+        const newFiles = Array.from(input.files);
+
+        // 检查总数是否超过3个
+        if (selectedFiles.length + newFiles.length > 3) {
+            alert(`最多只能选择3个文件，当前已选择${selectedFiles.length}个`);
+            input.value = '';
+            return;
+        }
+
+        // 验证并添加新文件
+        for (const file of newFiles) {
+            // 检查文件类型
+            if (!file.type.startsWith('image/')) {
+                alert(`文件 "${file.name}" 不是图片文件`);
                 input.value = '';
                 return;
             }
-            
-            // 验证并添加新文件
-            for (const file of newFiles) {
-                // 检查文件类型
-                if (!file.type.startsWith('image/')) {
-                    alert(`文件 "${file.name}" 不是图片文件`);
-                    input.value = '';
-                    return;
-                }
-                
-                // 检查文件大小（5MB）
-                if (file.size > 5 * 1024 * 1024) {
-                    alert(`文件 "${file.name}" 超过5MB限制`);
-                    input.value = '';
-                    return;
-                }
-                
-                // 检查是否已存在同名文件
-                if (selectedFiles.some(f => f.name === file.name)) {
-                    alert(`文件 "${file.name}" 已选择`);
-                    continue;
-                }
-                
-                // 添加文件
-                selectedFiles.push(file);
-            }
-            
-            // 更新显示
-            updateFileDisplay();
-            
-            // 清空input以便可以再次选择相同文件
-            input.value = '';
-        }
-        
-        // 移除文件
-        function removeFile(fileName) {
-            selectedFiles = selectedFiles.filter(file => file.name !== fileName);
-            updateFileDisplay();
-        }
-        
-        // 更新文件显示
-        function updateFileDisplay() {
-            const fileDisplay = document.getElementById('fileDisplay');
-            const filePlaceholder = document.getElementById('filePlaceholder');
-            
-            if (selectedFiles.length === 0) {
-                fileDisplay.innerHTML = '<span class="file-placeholder" id="filePlaceholder">未选择文件</span>';
+
+            // 检查文件大小（5MB）
+            if (file.size > 5 * 1024 * 1024) {
+                alert(`文件 "${file.name}" 超过5MB限制`);
+                input.value = '';
                 return;
             }
-            
-            // 移除占位符
-            if (filePlaceholder) {
-                filePlaceholder.remove();
+
+            // 检查是否已存在同名文件
+            if (selectedFiles.some(f => f.name === file.name)) {
+                alert(`文件 "${file.name}" 已选择`);
+                continue;
             }
-            
-            // 创建文件标签
-            let fileTagsHTML = '';
-            
-            selectedFiles.forEach((file, index) => {
-                // 截取文件名（如果太长）
-                let displayName = file.name;
-                if (displayName.length > 20) {
-                    displayName = displayName.substring(0, 15) + '...' + displayName.substring(displayName.length - 5);
-                }
-                
-                fileTagsHTML += `
-                    <div class="file-tag">
-                        <span class="file-tag-name" title="${file.name}">${displayName}</span>
-                        <button type="button" class="remove-file" onclick="removeFile('${file.name}')" title="移除文件">
-                            ×
-                        </button>
-                    </div>
-                `;
-            });
-            
-            fileDisplay.innerHTML = fileTagsHTML;
-            
-            // 更新隐藏的FormData
-            updateFormData();
+
+            // 添加文件
+            selectedFiles.push(file);
         }
-        
-        // 更新表单数据
-        function updateFormData() {
-            // 移除旧的隐藏文件输入
-            document.querySelectorAll('.hidden-file-input').forEach(el => el.remove());
-            
-            // 创建DataTransfer对象
-            const dataTransfer = new DataTransfer();
-            
-            // 添加所有文件
-            selectedFiles.forEach(file => {
+
+        // 更新显示
+        updateFileDisplay();
+
+        // 清空input以便可以再次选择相同文件
+        input.value = '';
+    }
+
+    // 移除文件
+    function removeFile(fileName) {
+        selectedFiles = selectedFiles.filter(file => file.name !== fileName);
+        updateFileDisplay();
+    }
+
+    // 更新文件显示
+    function updateFileDisplay() {
+        const fileDisplay = document.getElementById('fileDisplay');
+        const filePlaceholder = document.getElementById('filePlaceholder');
+
+        if (selectedFiles.length === 0) {
+            fileDisplay.innerHTML = '<span class="file-placeholder" id="filePlaceholder">未选择文件</span>';
+            return;
+        }
+
+        // 移除占位符
+        if (filePlaceholder) {
+            filePlaceholder.remove();
+        }
+
+        // 创建文件标签
+        let fileTagsHTML = '';
+
+        selectedFiles.forEach((file, index) => {
+            // 截取文件名（如果太长）
+            let displayName = file.name;
+            if (displayName.length > 20) {
+                displayName = displayName.substring(0, 15) + '...' + displayName.substring(displayName.length - 5);
+            }
+
+            fileTagsHTML += `
+                <div class="file-tag">
+                    <span class="file-tag-name" title="${file.name}">${displayName}</span>
+                    <button type="button" class="remove-file" onclick="removeFile('${file.name}')" title="移除文件">
+                        ×
+                    </button>
+                </div>
+            `;
+        });
+
+        fileDisplay.innerHTML = fileTagsHTML;
+
+        // 更新隐藏的FormData
+        updateFormData();
+    }
+
+    // 更新表单数据
+    function updateFormData() {
+        console.log('=== updateFormData ===');
+        console.log('selectedFiles 数量:', selectedFiles.length);
+
+        // 检查每个文件
+        selectedFiles.forEach((file, index) => {
+            console.log(`文件 ${index}:`, {
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                lastModified: file.lastModified
+            });
+        });
+
+        // 创建新的 DataTransfer 对象
+        const dataTransfer = new DataTransfer();
+
+        // 添加所有文件
+        selectedFiles.forEach(file => {
+            // 验证文件是否有效
+            if (file && file.name && file.size > 0) {
                 dataTransfer.items.add(file);
-            });
-            
-            // 创建新的文件输入
-            const input = document.getElementById('fileInput');
-            input.files = dataTransfer.files;
-        }
-        
-        // 页面加载时初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            // 初始化字符计数
-            const textarea = document.querySelector('textarea[name="description"]');
-            if (textarea) {
-                updateCharCount(textarea);
-            }
-            
-            // 自动隐藏消息提示
-            const alerts = document.querySelectorAll('.alert');
-            if (alerts.length > 0) {
-                setTimeout(() => {
-                    alerts.forEach(alert => {
-                        alert.style.opacity = '0';
-                        alert.style.transition = 'opacity 0.5s ease';
-                        setTimeout(() => alert.style.display = 'none', 500);
-                    });
-                }, 5000);
-            }
-            
-            // 表单验证
-            const form = document.getElementById('repairForm');
-            if (form) {
-                form.addEventListener('submit', function(event) {
-                    const category = document.querySelector('select[name="category"]').value;
-                    
-                    // 验证报修类别
-                    if (!category) {
-                        alert('请选择报修类别');
-                        event.preventDefault();
-                        return;
-                    }
-                    
-                    // 验证文件数量
-                    if (selectedFiles.length > 3) {
-                        alert('最多只能上传3张图片');
-                        event.preventDefault();
-                        return;
-                    }
-                });
+                console.log('添加文件到 DataTransfer:', file.name);
+            } else {
+                console.warn('跳过无效文件:', file);
             }
         });
-    </script>
+
+        // 获取文件输入元素
+        const fileInput = document.getElementById('fileInput');
+
+        // 更新文件列表
+        fileInput.files = dataTransfer.files;
+
+        console.log('更新后 fileInput.files 数量:', fileInput.files.length);
+        for (let i = 0; i < fileInput.files.length; i++) {
+            const f = fileInput.files[i];
+            console.log(`fileInput.files[${i}]:`, f.name, 'size:', f.size);
+        }
+    }
+
+    // 页面加载时初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        // 初始化字符计数
+        const textarea = document.querySelector('textarea[name="description"]');
+        if (textarea) {
+            updateCharCount(textarea);
+        }
+
+        // 自动隐藏消息提示
+        const alerts = document.querySelectorAll('.alert');
+        if (alerts.length > 0) {
+            setTimeout(() => {
+                alerts.forEach(alert => {
+                    alert.style.opacity = '0';
+                    alert.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => alert.style.display = 'none', 500);
+                });
+            }, 5000);
+        }
+
+        // 表单验证
+
+        const form = document.getElementById('repairForm');
+        if (form) {
+            form.addEventListener('submit', function(event) {
+                console.log('=== 表单提交验证 ===');
+
+                const category = document.querySelector('select[name="category"]').value;
+
+                // 验证报修类别
+                if (!category) {
+                    alert('请选择报修类别');
+                    event.preventDefault();
+                    return;
+                }
+
+                // 强制更新文件输入
+                console.log('提交前强制更新文件输入');
+                updateFormData();
+
+                const fileInput = document.getElementById('fileInput');
+                console.log('fileInput:', fileInput);
+                console.log('fileInput.files:', fileInput.files);
+                console.log('fileInput.files.length:', fileInput.files.length);
+
+                // 验证文件输入
+                if (fileInput.files.length === 0 && selectedFiles.length > 0) {
+                    console.error('文件没有正确绑定到input上');
+                    alert('文件上传配置错误，请重新选择文件');
+                    event.preventDefault();
+                    return;
+                }
+
+                // 检查每个文件
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    const file = fileInput.files[i];
+                    console.log(`验证文件 ${i}:`, file.name, 'size:', file.size);
+
+                    if (file.size === 0) {
+                        alert(`文件 "${file.name}" 为空，请重新选择`);
+                        event.preventDefault();
+                        return;
+                    }
+                }
+
+                // 创建FormData验证
+                const formData = new FormData(form);
+                console.log('FormData内容:');
+                let hasImages = false;
+                for (let [key, value] of formData.entries()) {
+                    console.log(`  ${key}:`, value);
+                    if (key === 'images') {
+                        hasImages = true;
+                        console.log(`    文件名: ${value.name}, 大小: ${value.size}, 类型: ${value.type}`);
+                        if (value.size === 0) {
+                            console.error('FormData中的文件大小为0');
+                        }
+                    }
+                }
+
+                if (!hasImages) {
+                    console.log('FormData中没有images字段');
+                }
+            });
+        }
+    });
+</script>
 </body>
 </html>

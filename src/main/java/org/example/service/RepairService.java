@@ -18,9 +18,9 @@ public class RepairService {
     @Autowired
     private RepairMapper repairMapper;
 
-    // 移除未使用的 DormService 注入
-    // @Autowired
-    // private DormService dormService;
+
+     @Autowired
+     private DormService dormService;
 
     // 报修类别列表
     private static final List<String> REPAIR_CATEGORIES = Arrays.asList(
@@ -169,33 +169,81 @@ public class RepairService {
     private List<String> saveRepairImages(MultipartFile[] images) {
         List<String> paths = new ArrayList<>();
 
+        if (images == null || images.length == 0) {
+            return paths;
+        }
+
         try {
-            // 创建保存目录
-            String uploadDir = System.getProperty("user.dir") + "/uploads/repair";
-            File dir = new File(uploadDir);
-            if (!dir.exists()) {
-                dir.mkdirs();
+            // 获取项目根目录
+            String projectDir = System.getProperty("user.dir");
+
+            // 构建上传目录路径
+            String uploadDirPath = projectDir + File.separator + "uploads" + File.separator + "repair";
+
+            // 创建目录
+            File uploadDir = new File(uploadDirPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
             }
 
+            // 处理上传的文件（最多3个）
             for (int i = 0; i < Math.min(images.length, 3); i++) {
                 MultipartFile image = images[i];
-                if (image != null && !image.isEmpty()) {
-                    // 生成文件名
-                    String originalFilename = image.getOriginalFilename();
-                    String fileExtension = originalFilename != null && originalFilename.contains(".") ?
-                            originalFilename.substring(originalFilename.lastIndexOf(".")) : ".jpg";
-                    String filename = "repair_" + System.currentTimeMillis() + "_" + i + fileExtension;
 
-                    // 保存文件
-                    File file = new File(dir, filename);
-                    image.transferTo(file);
+                // 跳过无效文件
+                if (image == null || image.isEmpty() || image.getSize() == 0) {
+                    continue;
+                }
 
-                    // 记录路径 (注意：这里返回的是相对路径，前端需要配合 ResourceHandler 访问)
-                    paths.add("repair/" + filename);
+                // 验证文件类型
+                String contentType = image.getContentType();
+                if (contentType == null || !contentType.startsWith("image/")) {
+                    continue;
+                }
+
+                // 验证文件大小（最大5MB）
+                if (image.getSize() > 5 * 1024 * 1024) {
+                    continue;
+                }
+
+                // 生成唯一文件名
+                String originalFilename = image.getOriginalFilename();
+                String fileExtension = ".jpg"; // 默认扩展名
+
+                if (originalFilename != null && originalFilename.contains(".")) {
+                    fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
+                } else {
+                    // 根据ContentType确定扩展名
+                    if (contentType != null) {
+                        if (contentType.contains("png")) {
+                            fileExtension = ".png";
+                        } else if (contentType.contains("gif")) {
+                            fileExtension = ".gif";
+                        } else if (contentType.contains("jpeg")) {
+                            fileExtension = ".jpg";
+                        }
+                    }
+                }
+
+                // 生成文件名：UUID + 扩展名
+                String uuid = UUID.randomUUID().toString().replace("-", "");
+                String filename = "repair_" + uuid + fileExtension;
+
+                // 创建目标文件
+                File destFile = new File(uploadDir, filename);
+
+                // 保存文件
+                image.transferTo(destFile);
+
+                // 验证文件是否保存成功
+                if (destFile.exists() && destFile.length() > 0) {
+                    paths.add(filename);
                 }
             }
-        } catch (IOException e) {
+
+        } catch (Exception e) {
             e.printStackTrace();
+            // 可以根据需要记录日志，但不要影响正常流程
         }
 
         return paths;

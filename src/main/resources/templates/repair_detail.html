@@ -308,13 +308,14 @@
                               th:if="${imagePaths == null or imagePaths.isEmpty()}">无上传图片</span>
                         
                         <!-- 图片预览区域 -->
-                        <div th:each="imagePath : ${imagePaths}" 
-                             class="image-item" 
-                             th:onclick="'openImageModal(this)'" 
-                             th:data-image="|/uploads/${imagePath}|">
-                            <img th:src="|/uploads/${imagePath}|" 
-                                 alt="报修图片" 
-                                 class="image-preview">
+                        <div th:each="imagePath : ${imagePaths}"
+                             class="image-item"
+                             th:onclick="'openImageModal(this)'"
+                             th:data-image="'/uploads/repair/' + ${imagePath}">
+                            <img th:src="'/uploads/repair/' + ${imagePath}"
+                                 alt="报修图片"
+                                 class="image-preview"
+                                 onerror="this.src='/images/no-image.png'">
                         </div>
                     </div>
                 </div>
@@ -323,7 +324,9 @@
         
         <!-- 按钮组 -->
         <div class="button-container">
-            <button type="button" class="btn-back" onclick="history.back()">返回</button>
+            <button type="button" class="btn-back" onclick="window.location.href='/student/student_index'">
+                返回
+            </button>
         </div>
     </div>
     

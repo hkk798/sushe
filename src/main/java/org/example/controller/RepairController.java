@@ -239,43 +239,57 @@ public class RepairController {
      */
     @GetMapping("/repair_detail")
     public String showRepairDetailPage(@RequestParam("orderId") Integer orderId,
-                                    HttpSession session,
-                                    Model model) {
-        // 权限验证
+                                       HttpSession session,
+                                       Model model) {
         User currentUser = (User) session.getAttribute("currentUser");
         Student currentStudent = (Student) session.getAttribute("currentStudent");
-        
+
         if (currentUser == null || currentStudent == null || !"student".equals(currentUser.getRole())) {
             return "redirect:/login";
         }
-        
+
         try {
             // 获取报修单详情
             RepairOrder repairOrder = repairService.getRepairOrderDetail(orderId);
-            
+
             // 验证报修单是否属于当前学生
             if (repairOrder == null || !repairOrder.getStudentId().equals(currentStudent.getStudentId())) {
                 model.addAttribute("errorMessage", "报修单不存在或无权查看");
                 return "repair_detail";
             }
-            
-            // 获取报修位置信息
-            Map<String, Object> dormInfo = dormService.getStudentDormInfo(currentStudent.getStudentId());
-            String repairLocation = repairService.getRepairLocation(dormInfo);
-            
+
+            // 关键修复：定义 repairLocation 变量
+            String repairLocation;
+
+            try {
+                // 获取宿舍信息
+                Map<String, Object> dormInfo = dormService.getStudentDormInfo(currentStudent.getStudentId());
+
+                if (dormInfo != null) {
+                    // 调用 repairService 获取位置信息
+                    repairLocation = repairService.getRepairLocation(dormInfo);
+                } else {
+                    repairLocation = "未分配宿舍";
+                }
+            } catch (Exception e) {
+                // 如果获取位置失败，使用默认值
+                repairLocation = "位置信息获取失败";
+                System.err.println("获取报修位置失败: " + e.getMessage());
+            }
+
             // 处理图片路径（如果有）
             List<String> imagePaths = new ArrayList<>();
             if (repairOrder.getImages() != null && !repairOrder.getImages().isEmpty()) {
                 imagePaths = Arrays.asList(repairOrder.getImages().split(","));
             }
-            
-            // 添加到模型
+
+            // 添加到模型 - 现在 repairLocation 已经定义
             model.addAttribute("repairOrder", repairOrder);
             model.addAttribute("repairLocation", repairLocation);
             model.addAttribute("imagePaths", imagePaths);
-            
+
             return "repair_detail";
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             model.addAttribute("errorMessage", "加载报修详情失败: " + e.getMessage());

@@ -368,11 +368,13 @@
         <!-- 按钮组 -->
         <div class="button-group">
             <button type="button" class="btn-repair" 
-                    th:onclick="${dormInfo != null} ? 'window.location.href=\'/room_repair_history\'': ''"
+                    th:onclick="${dormInfo != null} ? 'window.location.href=\'/my_repairs\'': ''"
                     th:disabled="${dormInfo == null}">
                 查看本房间报修历史
             </button>
-            <button type="button" class="btn-back" onclick="history.back()">返回</button>
+            <button type="button" class="btn-back" onclick="window.location.href='/student/student_index'">
+                返回
+            </button>
         </div>
     </div>
 
