@@ -242,16 +242,13 @@
             <div class="info-row">
                 <div class="info-label">楼栋：</div>
                 <div class="info-content">
-                    <span th:if="${dormInfo.building != null}">
-                        <span th:text="${dormInfo.building.buildingName != null} ? 
-                                 ${dormInfo.building.buildingName} : 
-                                 (${dormInfo.building.buildingNo != null} ? 
-                                 ${dormInfo.building.buildingNo} + '楼' : '未知楼栋')">
-                        </span>
-                    </span>
-                    <span th:unless="${dormInfo.building != null}">
-                        暂无楼栋信息
-                    </span>
+    <span th:if="${dormInfo.buildingName != null}">
+         <span th:text="${dormInfo.buildingName}"></span>
+    </span>
+
+                    <span th:unless="${dormInfo.buildingName != null}">
+        暂无楼栋信息
+    </span>
                 </div>
             </div>
             
