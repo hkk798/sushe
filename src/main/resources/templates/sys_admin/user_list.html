@@ -138,9 +138,6 @@
                                 </td>
 
                                 <td>
-                                    <a href="#" class="btn btn-sm btn-outline-primary me-1" title="编辑">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
 
                                     <a th:if="${user.status == 'active'}"
                                        th:href="@{/admin/user/delete/{id}(id=${user.userId})}"

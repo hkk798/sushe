@@ -20,7 +20,11 @@ public class UserService {
     
     @Autowired
     private UserMapper userMapper;
-    
+
+
+    @Autowired
+    private AllocationService allocationService;
+
     /**
      * 用户登录验证
      */
@@ -219,17 +223,34 @@ public class UserService {
     /**
      * 更新用户状态
      */
+    @Transactional // ✅ 加上事务注解，保证状态更新和退宿操作的一致性
     public boolean updateUserStatus(Integer userId, String status) {
         if (userId == null || !StringUtils.hasText(status)) {
             return false;
         }
-        
+
         try {
+            // ✅ [新增逻辑] 如果是将状态改为 'inactive' (禁用)，且用户是学生，则执行退宿
+            if ("inactive".equals(status)) {
+                // 1. 先查用户角色
+                User user = userMapper.findById(userId);
+                if (user != null && "student".equals(user.getRole())) {
+                    // 2. 查学生信息
+                    Student student = userMapper.findStudentByUserId(userId);
+                    if (student != null) {
+                        // 3. 调用分配服务，移除宿舍
+                        allocationService.removeStudentFromDorm(student.getStudentId());
+                    }
+                }
+            }
+
+            // 执行原有的状态更新
             int result = userMapper.updateStatus(userId, status);
             return result > 0;
+
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            throw new RuntimeException("更新状态失败: " + e.getMessage());
         }
     }
 

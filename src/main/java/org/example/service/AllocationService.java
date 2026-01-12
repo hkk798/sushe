@@ -10,4 +10,5 @@ public interface AllocationService {
     void assignDorm(Integer studentId, Integer roomId, Integer adminId);
 
     void changeDorm(Integer studentId, Integer newRoomId, Integer adminId);
+    void removeStudentFromDorm(Integer studentId);
 }

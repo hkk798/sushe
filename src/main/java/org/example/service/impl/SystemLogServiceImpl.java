@@ -2,11 +2,15 @@ package org.example.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.example.entity.AllocationRecord;
 import org.example.entity.SystemLog;
+import org.example.mapper.AllocationRecordMapper;
+import org.example.mapper.StudentMapper;
 import org.example.mapper.SystemLogMapper;
 import org.example.service.SystemLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,6 +20,7 @@ public class SystemLogServiceImpl implements SystemLogService {
 
     @Autowired
     private SystemLogMapper systemLogMapper;
+
 
     @Override
     public List<SystemLog> getAllLogs() {
@@ -40,4 +45,5 @@ public class SystemLogServiceImpl implements SystemLogService {
         // 3. 封装返回
         return new PageInfo<>(logs);
     }
+
 }
