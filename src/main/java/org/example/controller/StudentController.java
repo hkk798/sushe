@@ -116,9 +116,9 @@ public class StudentController {
 
     @PostMapping("/student_info/update")
     public String updateStudentInfo(@RequestParam(required = false) String phone,
-                                    @RequestParam(required = false) String email,
-                                    HttpSession session,
-                                    Model model) {
+            @RequestParam(required = false) String email,
+            HttpSession session,
+            Model model) {
 
         // 权限验证
         User currentUser = (User) session.getAttribute("currentUser");
@@ -129,11 +129,9 @@ public class StudentController {
         }
 
         try {
-             //更新学生信息
-            //这里需要调用UserService或StudentService来更新电话和邮箱
+            // 更新学生信息
+            // 这里需要调用UserService或StudentService来更新电话和邮箱
             boolean success = studentService.updateContactInfo(currentStudent.getStudentId(), phone, email);
-
-
 
             if (success) {
                 // 更新session中的学生信息
@@ -180,7 +178,9 @@ public class StudentController {
 
             model.addAttribute("student", studentData.get("student"));
             model.addAttribute("dormInfo", studentData.get("dormInfo"));
-            model.addAttribute("roommates", studentData.get("roommates"));
+
+            // 关键：从studentData中获取舍友信息，前端HTML使用的是otherRoommates
+            model.addAttribute("otherRoommates", studentData.get("roommates"));
 
             if (studentData.get("dormInfo") == null) {
                 model.addAttribute("warningMessage", "您当前没有宿舍分配信息。");
@@ -194,7 +194,4 @@ public class StudentController {
         return "my_dorm";
     }
 
-
 }
-
-

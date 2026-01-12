@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.example.service.StudentService;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -20,6 +22,9 @@ public class AllocationController {
 
     @Autowired
     private org.example.mapper.UserMapper userMapper;
+
+    @Autowired
+    private StudentService studentService;
 
     // 1. 待分配列表
     @GetMapping("/list")
@@ -50,12 +55,25 @@ public class AllocationController {
 
     @GetMapping("/search")
     public String searchStudent(@RequestParam String studentNo,
-                                org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+                                RedirectAttributes redirectAttributes) {
+
+        // 1. 查询学生是否存在
         Student student = userMapper.findStudentByStudentNo(studentNo);
         if (student == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "未找到学号为 " + studentNo + " 的学生！");
             return "redirect:/dorm_admin_index";
         }
+
+        // 2. [新增] 检查该学生是否已经分配了宿舍
+        boolean hasDorm = studentService.hasDormAllocation(student.getStudentId());
+        if (hasDorm) {
+            // 如果已分配，添加错误消息并跳回首页，不再进入分配页面
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "操作拦截：学生 " + student.getRealName() + " (" + studentNo + ") 已经分配过宿舍了！");
+            return "redirect:/dorm_admin_index";
+        }
+
+        // 3. 未分配，跳转到分配页面
         return "redirect:/admin/allocation/assign?studentId=" + student.getStudentId();
     }
 

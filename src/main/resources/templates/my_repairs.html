@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +15,7 @@
             min-height: 100vh;
             padding: 20px;
         }
-        
+
         .repair-container {
             width: 100%;
             max-width: 1200px;
@@ -24,7 +25,7 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             margin: 20px auto;
         }
-        
+
         .main-title {
             font-size: 24px;
             font-weight: bold;
@@ -34,7 +35,7 @@
             padding-bottom: 15px;
             border-bottom: 2px solid #f0f0f0;
         }
-        
+
         /* 状态选项卡 */
         .status-tabs {
             display: flex;
@@ -42,7 +43,7 @@
             margin-bottom: 25px;
             flex-wrap: wrap;
         }
-        
+
         .status-tab {
             padding: 8px 20px;
             border: 2px solid #ddd;
@@ -56,19 +57,19 @@
             text-decoration: none;
             display: inline-block;
         }
-        
+
         .status-tab:hover {
             border-color: #667eea;
             color: #667eea;
             transform: translateY(-2px);
         }
-        
+
         .status-tab.active {
             background: #333;
             border-color: #333;
             color: white;
         }
-        
+
         .status-count {
             margin-left: 5px;
             background: rgba(255, 255, 255, 0.2);
@@ -76,14 +77,14 @@
             border-radius: 10px;
             font-size: 12px;
         }
-        
+
         /* 表格样式 */
         .repair-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 30px;
         }
-        
+
         .repair-table th {
             background: #f8f9fa;
             padding: 15px;
@@ -92,17 +93,17 @@
             color: #333;
             border-bottom: 2px solid #e9ecef;
         }
-        
+
         .repair-table td {
             padding: 15px;
             border-bottom: 1px solid #e9ecef;
             vertical-align: middle;
         }
-        
+
         .repair-table tr:hover {
             background: #f8f9fa;
         }
-        
+
         /* 状态标签 */
         .status-badge {
             padding: 4px 10px;
@@ -111,31 +112,31 @@
             font-weight: 500;
             display: inline-block;
         }
-        
+
         .status-pending {
             background: #fff3cd;
             color: #856404;
             border: 1px solid #ffeaa7;
         }
-        
+
         .status-processing {
             background: #d1ecf1;
             color: #0c5460;
             border: 1px solid #bee5eb;
         }
-        
+
         .status-completed {
             background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
-        
+
         /* 操作按钮 */
         .action-buttons {
             display: flex;
             gap: 10px;
         }
-        
+
         .btn-detail {
             padding: 6px 12px;
             background: #667eea;
@@ -148,13 +149,13 @@
             display: inline-block;
             transition: all 0.3s;
         }
-        
+
         .btn-detail:hover {
             background: #5a67d8;
             transform: translateY(-1px);
             box-shadow: 0 3px 10px rgba(102, 126, 234, 0.2);
         }
-        
+
         .btn-cancel {
             padding: 6px 12px;
             background: white;
@@ -165,78 +166,89 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-        
+
         .btn-cancel:hover {
             background: #dc3545;
             color: white;
             transform: translateY(-1px);
         }
-        
+
         /* 按钮组 */
         .button-group {
             display: flex;
-            gap: 15px;
+            justify-content: space-between;
+            /* 左右分开 */
+            align-items: center;
             margin-top: 40px;
         }
-        
+
         .btn-primary {
-            flex: 1;
             background: #333;
             border: none;
             color: white;
             font-size: 16px;
             font-weight: bold;
             height: 50px;
+            padding: 0 40px;
+            /* 固定内边距 */
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
             text-decoration: none;
-            display: flex;
+            display: inline-flex;
+            /* 改为行内弹性布局 */
             align-items: center;
             justify-content: center;
+            min-width: 160px;
+            /* 设置最小宽度 */
         }
-        
+
         .btn-primary:hover {
             background: #555;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
-        
-        .btn-secondary {
-            flex: 1;
+
+        .btn-back {
             background: white;
+            /* 改为白色背景 */
             border: 2px solid #333;
+            /* 黑色边框 */
             color: #333;
+            /* 黑色文字 */
             font-size: 16px;
             font-weight: bold;
             height: 50px;
+            padding: 0 40px;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            min-width: 160px;
         }
-        
-        .btn-secondary:hover {
+
+        .btn-back:hover {
             background: #f5f5f5;
+            /* 悬停时浅灰色背景 */
+            border-color: #333;
+            /* 保持黑色边框 */
+            color: #333;
+            /* 保持黑色文字 */
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
-        
+
         /* 空数据提示 */
         .empty-message {
             text-align: center;
             padding: 60px 20px;
             color: #666;
         }
-        
+
         .empty-message h4 {
             margin-bottom: 15px;
             color: #333;
         }
-        
+
         /* 消息提示 */
         .alert {
             padding: 12px 15px;
@@ -244,55 +256,55 @@
             margin-bottom: 25px;
             border: 1px solid transparent;
         }
-        
+
         .alert-success {
             color: #155724;
             background-color: #d4edda;
             border-color: #c3e6cb;
         }
-        
+
         .alert-danger {
             color: #721c24;
             background-color: #f8d7da;
             border-color: #f5c6cb;
         }
-        
+
         /* 响应式设计 */
         @media (max-width: 768px) {
             .repair-container {
                 padding: 20px;
             }
-            
+
             .status-tabs {
                 flex-direction: column;
                 align-items: flex-start;
             }
-            
+
             .status-tab {
                 width: 100%;
                 text-align: center;
             }
-            
+
             .repair-table {
                 display: block;
                 overflow-x: auto;
             }
-            
+
             .action-buttons {
                 flex-direction: column;
                 gap: 5px;
             }
-            
+
             .button-group {
                 flex-direction: column;
             }
         }
-        
+
         @media (max-width: 480px) {
             .main-title {
                 font-size: 20px;
             }
-            
+
             .repair-table th,
             .repair-table td {
                 padding: 10px 5px;
@@ -301,11 +313,12 @@
         }
     </style>
 </head>
+
 <body>
     <div class="repair-container">
         <!-- 第一部分：标题 -->
         <h1 class="main-title">我的报修历史</h1>
-        
+
         <!-- 消息提示 -->
         <div th:if="${successMessage}" class="alert alert-success">
             <span th:text="${successMessage}"></span>
@@ -313,35 +326,34 @@
         <div th:if="${errorMessage}" class="alert alert-danger">
             <span th:text="${errorMessage}"></span>
         </div>
-        
+
         <!-- 第二部分：状态筛选选项卡 -->
         <div class="status-tabs">
-            <a th:href="@{/my_repairs(status='all')}" 
-               th:class="${currentStatus == 'all'} ? 'status-tab active' : 'status-tab'">
+            <a th:href="@{/my_repairs(status='all')}"
+                th:class="${currentStatus == 'all'} ? 'status-tab active' : 'status-tab'">
                 全部
-                <span th:if="${statusCounts != null}" class="status-count" 
-                      th:text="${statusCounts.get('all')}">0</span>
+                <span th:if="${statusCounts != null}" class="status-count" th:text="${statusCounts.get('all')}">0</span>
             </a>
-            <a th:href="@{/my_repairs(status='pending')}" 
-               th:class="${currentStatus == 'pending'} ? 'status-tab active' : 'status-tab'">
+            <a th:href="@{/my_repairs(status='pending')}"
+                th:class="${currentStatus == 'pending'} ? 'status-tab active' : 'status-tab'">
                 待处理
-                <span th:if="${statusCounts != null}" class="status-count" 
-                      th:text="${statusCounts.get('pending')}">0</span>
+                <span th:if="${statusCounts != null}" class="status-count"
+                    th:text="${statusCounts.get('pending')}">0</span>
             </a>
-            <a th:href="@{/my_repairs(status='processing')}" 
-               th:class="${currentStatus == 'processing'} ? 'status-tab active' : 'status-tab'">
+            <a th:href="@{/my_repairs(status='processing')}"
+                th:class="${currentStatus == 'processing'} ? 'status-tab active' : 'status-tab'">
                 处理中
-                <span th:if="${statusCounts != null}" class="status-count" 
-                      th:text="${statusCounts.get('processing')}">0</span>
+                <span th:if="${statusCounts != null}" class="status-count"
+                    th:text="${statusCounts.get('processing')}">0</span>
             </a>
-            <a th:href="@{/my_repairs(status='completed')}" 
-               th:class="${currentStatus == 'completed'} ? 'status-tab active' : 'status-tab'">
+            <a th:href="@{/my_repairs(status='completed')}"
+                th:class="${currentStatus == 'completed'} ? 'status-tab active' : 'status-tab'">
                 已完成
-                <span th:if="${statusCounts != null}" class="status-count" 
-                      th:text="${statusCounts.get('completed')}">0</span>
+                <span th:if="${statusCounts != null}" class="status-count"
+                    th:text="${statusCounts.get('completed')}">0</span>
             </a>
         </div>
-        
+
         <!-- 第三部分：报修列表表格 -->
         <div th:if="${repairs != null and not repairs.isEmpty()}">
             <table class="repair-table">
@@ -359,8 +371,8 @@
                         <td th:text="${repair.orderId}">RO20240001</td>
                         <td>
                             <div style="font-weight: 500;" th:text="${repair.title}">报修申请 - 电路故障</div>
-                            <div style="font-size: 13px; color: #666; margin-top: 3px;" 
-                                 th:text="${repair.description != null and repair.description != ''} ? ${repair.description} : '无详细描述'">
+                            <div style="font-size: 13px; color: #666; margin-top: 3px;"
+                                th:text="${repair.description != null and repair.description != ''} ? ${repair.description} : '无详细描述'">
                                 电路短路需要维修
                             </div>
                         </td>
@@ -380,15 +392,11 @@
                         <td>
                             <div class="action-buttons">
                                 <!-- 详情按钮（所有状态都显示） -->
-                                <a th:href="@{/repair_detail(orderId=${repair.orderId})}" 
-                                   class="btn-detail">详情</a>
-                                
+                                <a th:href="@{/repair_detail(orderId=${repair.orderId})}" class="btn-detail">详情</a>
+
                                 <!-- 撤销按钮（仅待处理状态显示） -->
-                                <form th:if="${repair.status == 'pending'}" 
-                                      th:action="@{/repair/cancel}" 
-                                      method="post" 
-                                      style="display: inline;"
-                                      onsubmit="return confirm('确定要撤销此报修申请吗？')">
+                                <form th:if="${repair.status == 'pending'}" th:action="@{/repair/cancel}" method="post"
+                                    style="display: inline;" onsubmit="return confirm('确定要撤销此报修申请吗？')">
                                     <input type="hidden" name="orderId" th:value="${repair.orderId}">
                                     <button type="submit" class="btn-cancel">撤销</button>
                                 </form>
@@ -398,13 +406,13 @@
                 </tbody>
             </table>
         </div>
-        
+
         <!-- 空数据提示 -->
         <div th:if="${repairs == null or repairs.isEmpty()}" class="empty-message">
             <h4>暂无报修记录</h4>
             <p>您还没有提交过报修申请</p>
         </div>
-        
+
         <!-- 第四部分：底部按钮 -->
         <div class="button-group">
             <a th:href="@{/repair_submit}" class="btn-primary">我要报修</a>
@@ -416,7 +424,7 @@
 
     <script>
         // 自动隐藏消息提示
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const alerts = document.querySelectorAll('.alert');
             if (alerts.length > 0) {
                 setTimeout(() => {
@@ -427,11 +435,11 @@
                     });
                 }, 5000);
             }
-            
+
             // 确认删除
             const cancelForms = document.querySelectorAll('form[action*="cancel"]');
             cancelForms.forEach(form => {
-                form.addEventListener('submit', function(e) {
+                form.addEventListener('submit', function (e) {
                     if (!confirm('确定要撤销此报修申请吗？此操作不可恢复！')) {
                         e.preventDefault();
                     }
@@ -440,4 +448,5 @@
         });
     </script>
 </body>
+
 </html>

@@ -53,7 +53,7 @@ public class StudentService {
 
                 // === 放入床位号 (兼容两个页面的不同写法) ===
                 dormInfo.put("bedNumber", allocation.getBedNo()); // index页面用
-                dormInfo.put("bedNo", allocation.getBedNo());     // my_dorm页面用
+                dormInfo.put("bedNo", allocation.getBedNo()); // my_dorm页面用
 
                 // === 放入费用信息 ===
                 BigDecimal yearlyFee = allocation.getRoom().getYearlyFee();
@@ -77,6 +77,7 @@ public class StudentService {
                 List<Map<String, Object>> roommates = studentMapper.findRoommates(
                         allocation.getRoomId(), studentId);
                 dashboardData.put("roommates", roommates);
+                dashboardData.put("otherRoommates", roommates);
             } else {
                 dashboardData.put("dormInfo", null);
                 dashboardData.put("roommates", null);
@@ -88,8 +89,8 @@ public class StudentService {
 
             // 5. 计算统计信息
             Map<String, Object> stats = new HashMap<>();
-            stats.put("totalRoommates", dashboardData.get("roommates") != null ?
-                    ((List<?>) dashboardData.get("roommates")).size() : 0);
+            stats.put("totalRoommates",
+                    dashboardData.get("roommates") != null ? ((List<?>) dashboardData.get("roommates")).size() : 0);
             stats.put("hasDorm", dashboardData.get("dormInfo") != null);
 
             dashboardData.put("stats", stats);
@@ -106,7 +107,8 @@ public class StudentService {
     public boolean validateStudentAccess(Integer userId, Integer studentId) {
         try {
             User user = userMapper.findById(userId);
-            if (user == null || !"student".equals(user.getRole())) return false;
+            if (user == null || !"student".equals(user.getRole()))
+                return false;
             Integer actualUserId = studentMapper.findUserIdByStudentId(studentId);
             return actualUserId != null && actualUserId.equals(userId);
         } catch (Exception e) {
@@ -132,7 +134,6 @@ public class StudentService {
             return null;
         }
     }
-
 
     @Transactional
     public boolean updateContactInfo(Integer studentId, String phone, String email) {
