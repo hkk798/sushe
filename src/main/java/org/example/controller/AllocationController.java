@@ -78,6 +78,6 @@ public class AllocationController {
         allocationService.changeDorm(studentId, roomId, adminId);
 
         // 换寝成功后，建议返回到“我的楼栋房间列表”或者“首页”
-        return "redirect:/dorm_admin/rooms"; // 假设这是你的房间列表路径，如果不是请修改
+        return "redirect:/admin/dorm/rooms"; // 假设这是你的房间列表路径，如果不是请修改
     }
 }
