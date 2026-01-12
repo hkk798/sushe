@@ -58,6 +58,8 @@ public class UserManageController {
                           // 管理员特有字段
                           @RequestParam(required = false) String adminNo,
                           @RequestParam(required = false) String position,
+
+                          @RequestParam(required = false) String manageBuilding,
                           Model model, HttpSession session) {
 
         // 1. 权限校验
@@ -117,6 +119,13 @@ public class UserManageController {
                 admin.setAdminNo(adminNo);
                 admin.setPosition(position);
                 admin.setWorkPhone(phone);
+
+                // [新增] 设置管理楼栋
+                // 只有当角色是宿管(building_admin)时，这个字段才有实际意义，但存进去也无妨
+                if (manageBuilding != null && !manageBuilding.isEmpty()) {
+                    // 统一一下格式，防止中英文逗号混用
+                    admin.setManageBuilding(manageBuilding.replace("，", ","));
+                }
 
 
                 success = userService.register(user, null, admin);

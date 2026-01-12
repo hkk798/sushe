@@ -19,6 +19,10 @@ public class AllocationController {
     @Autowired
     private AllocationService allocationService;
 
+    // [新增] 注入 UserMapper (因为 UserMapper 中有根据学号查学生的方法)
+    @Autowired
+    private org.example.mapper.UserMapper userMapper;
+
     // 1. 待分配列表
     @GetMapping("/list")
     public String list(Model model) {
@@ -52,5 +56,24 @@ public class AllocationController {
 
         allocationService.assignDorm(studentId, roomId, adminId);
         return "redirect:/admin/allocation/list";
+    }
+
+
+    @GetMapping("/search")
+    public String searchStudent(@RequestParam String studentNo,
+                                org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        // 1. 根据学号查找学生 (使用 UserMapper 中已有的方法)
+        Student student = userMapper.findStudentByStudentNo(studentNo);
+
+        // 2. 如果找不到学生，提示错误并返回首页
+        if (student == null) {
+            // 使用 RedirectAttributes 可以在重定向后携带错误信息
+            redirectAttributes.addFlashAttribute("errorMessage", "未找到学号为 " + studentNo + " 的学生！");
+            return "redirect:/dorm_admin_index";
+        }
+
+        // 3. 找到学生，直接跳转到该学生的分配页面
+        // 复用已有的 /assign 接口
+        return "redirect:/admin/allocation/assign?studentId=" + student.getStudentId();
     }
 }
