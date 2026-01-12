@@ -43,4 +43,17 @@ public interface RoomMapper {
             "WHERE r.building_id = #{buildingId} " + // 👈 加了 WHERE 条件
             "ORDER BY r.room_no")
     List<Room> findByBuildingId(Integer buildingId);
+
+
+    @Select("<script>" +
+            "SELECT r.*, b.building_name " +
+            "FROM Room r " +
+            "JOIN Building b ON r.building_id = b.building_id " +
+            "WHERE b.building_name IN " +
+            "<foreach item='name' collection='buildingNames' open='(' separator=',' close=')'>" +
+            "#{name}" +
+            "</foreach>" +
+            "ORDER BY b.building_name, r.room_no" +
+            "</script>")
+    List<Room> findByBuildingNames(@Param("buildingNames") List<String> buildingNames);
 }

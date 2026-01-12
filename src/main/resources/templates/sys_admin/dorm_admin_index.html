@@ -32,7 +32,6 @@
             border-radius: 10px;
             overflow: hidden;
         }
-        /* 侧边栏激活状态样式 */
         .list-group-item.active {
             background-color: #0d6efd;
             border-color: #0d6efd;
@@ -75,6 +74,11 @@
                 <a href="/admin/allocation/list" class="list-group-item list-group-item-action py-3">
                     <i class="fas fa-bed me-3 text-secondary"></i>宿舍分配
                 </a>
+
+                <a href="/admin/dorm/rooms" class="list-group-item list-group-item-action py-3">
+                    <i class="fas fa-door-open me-3 text-secondary"></i>房间管理
+                </a>
+
                 <a href="/admin/repair" class="list-group-item list-group-item-action py-3 d-flex justify-content-between align-items-center">
                     <span><i class="fas fa-tools me-3 text-secondary"></i>报修处理</span>
                     <span class="badge bg-danger rounded-pill" th:if="${pendingRepairsCount > 0}" th:text="${pendingRepairsCount}"></span>
@@ -129,7 +133,7 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div>
-                                    <h6 class="text-muted mb-1">待处理报修</h6>
+                                    <h6 class="text-muted mb-1">未完成报修</h6>
                                     <h2 class="mb-0 fw-bold text-danger" th:text="${pendingRepairsCount}">0</h2>
                                 </div>
                                 <div class="icon-box bg-warning bg-opacity-10 text-warning">
@@ -163,7 +167,7 @@
             <div class="card table-card shadow-sm mb-4">
                 <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
                     <h6 class="mb-0 fw-bold text-dark">
-                        <i class="fas fa-clipboard-list me-2 text-primary"></i>最新待处理报修
+                        <i class="fas fa-clipboard-list me-2 text-primary"></i>最新未完成报修
                     </h6>
                     <a href="/admin/repair" class="btn btn-light btn-sm text-primary fw-bold">
                         查看全部 <i class="fas fa-angle-right ms-1"></i>
@@ -192,7 +196,10 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="fw-bold d-block text-dark" th:text="${repair.title}">灯坏了</span>
+                                    <div class="d-flex align-items-center">
+                                        <span class="fw-bold d-block text-dark me-2" th:text="${repair.title}">灯坏了</span>
+                                        <span th:if="${repair.status == 'processing'}" class="badge bg-info text-dark" style="font-size: 0.7rem;">处理中</span>
+                                    </div>
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
@@ -209,9 +216,45 @@
                                     <span th:text="${#temporals.format(repair.submit_time, 'MM-dd HH:mm')}">01-10 12:00</span>
                                 </td>
                                 <td class="text-end pe-4">
-                                    <a th:href="@{/admin/repair/process/{id}(id=${repair.order_id})}" class="btn btn-sm btn-primary px-3 rounded-pill">
-                                        接单处理
-                                    </a>
+                                    <div class="btn-group" role="group">
+                                        <a th:if="${repair.status == 'pending'}"
+                                           th:href="@{/admin/repair/process/{id}(id=${repair.order_id})}"
+                                           class="btn btn-sm btn-outline-primary"
+                                           onclick="return confirm('确认接单处理吗？')">
+                                            接单
+                                        </a>
+                                        <button type="button"
+                                                class="btn btn-sm btn-success"
+                                                data-bs-toggle="modal"
+                                                th:data-bs-target="'#completeModal' + ${repair.order_id}">
+                                            完成
+                                        </button>
+                                    </div>
+
+                                    <div class="modal fade text-start" th:id="'completeModal' + ${repair.order_id}" tabindex="-1">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form action="/admin/repair/complete" method="post">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">完成报修处理</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <input type="hidden" name="orderId" th:value="${repair.order_id}">
+                                                        <input type="hidden" name="source" value="index">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">处理结果/备注</label>
+                                                            <textarea name="remarks" class="form-control" rows="3" required placeholder="请填写维修结果..."></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                                        <button type="submit" class="btn btn-success">确认完成</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(latestRepairs)}">
@@ -219,7 +262,7 @@
                                     <div class="text-muted opacity-50 mb-2">
                                         <i class="fas fa-check-circle fa-3x"></i>
                                     </div>
-                                    <p class="mb-0 text-muted">暂无待处理的报修申请</p>
+                                    <p class="mb-0 text-muted">暂无未完成的报修申请</p>
                                 </td>
                             </tr>
                             </tbody>

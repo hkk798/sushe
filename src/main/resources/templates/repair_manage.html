@@ -10,7 +10,7 @@
 
 <nav class="navbar navbar-dark bg-primary mb-4">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/sys_admin_index"><i class="fas fa-chevron-left me-2"></i>返回工作台</a>
+        <a class="navbar-brand" href="/dorm_admin_index"><i class="fas fa-chevron-left me-2"></i>返回工作台</a>
         <span class="text-white">报修管理</span>
     </div>
 </nav>
@@ -20,20 +20,20 @@
         <div class="card-body">
             <ul class="nav nav-pills nav-fill">
                 <li class="nav-item">
-                    <a class="nav-link" th:classappend="${currentStatus == 'pending'} ? 'active'"
-                       href="/dorm/repair?status=pending">
+                    <a class="nav-link" th:classappend="${status == 'pending'} ? 'active'"
+                       href="/admin/repair?status=pending">
                         <i class="fas fa-clock me-1"></i>待处理
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:classappend="${currentStatus == 'processing'} ? 'active'"
-                       href="/dorm/repair?status=processing">
+                    <a class="nav-link" th:classappend="${status == 'processing'} ? 'active'"
+                       href="/admin/repair?status=processing">
                         <i class="fas fa-tools me-1"></i>处理中
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:classappend="${currentStatus == 'completed'} ? 'active'"
-                       href="/dorm/repair?status=completed">
+                    <a class="nav-link" th:classappend="${status == 'completed'} ? 'active'"
+                       href="/admin/repair?status=completed">
                         <i class="fas fa-check-circle me-1"></i>已完成
                     </a>
                 </li>
@@ -73,12 +73,19 @@
                         </td>
                         <td th:text="${#temporals.format(item.submitTime, 'MM-dd HH:mm')}"></td>
                         <td>
-                            <a th:if="${item.status == 'pending'}"
-                               th:href="@{/dorm/repair/process/{id}(id=${item.orderId})}"
-                               class="btn btn-sm btn-primary"
-                               onclick="return confirm('确认开始处理此报修单吗？')">
-                                <i class="fas fa-wrench me-1"></i>接单
-                            </a>
+                            <div th:if="${item.status == 'pending'}">
+                                <a th:href="@{/admin/repair/process/{id}(id=${item.orderId})}"
+                                   class="btn btn-sm btn-primary"
+                                   onclick="return confirm('确认开始处理此报修单吗？')">
+                                    <i class="fas fa-wrench me-1"></i>接单
+                                </a>
+                                <button type="button"
+                                        class="btn btn-sm btn-success ms-1"
+                                        data-bs-toggle="modal"
+                                        th:data-bs-target="'#completeModal' + ${item.orderId}">
+                                    <i class="fas fa-check me-1"></i>完成
+                                </button>
+                            </div>
 
                             <button th:if="${item.status == 'processing'}"
                                     type="button"
@@ -88,18 +95,19 @@
                                 <i class="fas fa-check me-1"></i>完成
                             </button>
 
-                            <a th:href="@{/dorm/repair/detail(orderId=${item.orderId})}" class="btn btn-sm btn-outline-secondary">详情</a>
+                            <a th:href="@{/dorm/repair/detail(orderId=${item.orderId})}" class="btn btn-sm btn-outline-secondary ms-1">详情</a>
 
                             <div class="modal fade" th:id="'completeModal' + ${item.orderId}" tabindex="-1">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
-                                        <form action="/dorm/repair/complete" method="post">
+                                        <form action="/admin/repair/complete" method="post">
                                             <div class="modal-header">
                                                 <h5 class="modal-title">完成报修处理</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
                                             <div class="modal-body">
                                                 <input type="hidden" name="orderId" th:value="${item.orderId}">
+                                                <input type="hidden" name="source" value="list">
                                                 <div class="mb-3">
                                                     <label class="form-label">处理结果/备注</label>
                                                     <textarea name="remarks" class="form-control" rows="3" required placeholder="请填写维修结果..."></textarea>
@@ -119,7 +127,7 @@
                     <tr th:if="${#lists.isEmpty(repairs)}">
                         <td colspan="6" class="text-center py-5 text-muted">
                             <i class="fas fa-clipboard-check fa-3x mb-3"></i>
-                            <p>当前没有<span th:text="${currentStatus == 'pending' ? '待处理' : '相关'}"></span>的报修记录</p>
+                            <p>当前没有<span th:text="${status == 'pending' ? '待处理' : '相关'}"></span>的报修记录</p>
                         </td>
                     </tr>
                     </tbody>

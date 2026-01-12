@@ -142,6 +142,17 @@ public interface StudentMapper {
     @Select("SELECT COUNT(*) FROM Student s " +
             "WHERE NOT EXISTS (SELECT 1 FROM AllocationRecord ar WHERE ar.student_id = s.student_id AND ar.status = 'active')")
     int countUnassignedStudents();
+
+
+
+    @Select("SELECT s.student_id, s.student_no, s.gender, s.major, s.class_name, u.real_name, u.phone, ar.bed_no " +
+            "FROM Student s " +
+            "JOIN User u ON s.user_id = u.user_id " +
+            "JOIN AllocationRecord ar ON s.student_id = ar.student_id " +
+            "WHERE ar.room_id = #{roomId} " +
+            "AND ar.status = 'active' " +
+            "ORDER BY ar.bed_no")
+    List<Map<String, Object>> findStudentsByRoomId(Integer roomId);
 }
 
 

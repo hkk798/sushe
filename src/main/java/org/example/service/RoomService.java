@@ -10,4 +10,6 @@ public interface RoomService {
     void deleteRoom(Integer id);
     // 添加这一行
     List<Room> getRoomsByBuildingId(Integer buildingId);
+
+    List<Room> getRoomsByBuildingNames(List<String> buildingNames);
 }

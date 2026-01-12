@@ -45,4 +45,13 @@ public class RoomServiceImpl implements RoomService {
     public List<Room> getRoomsByBuildingId(Integer buildingId) {
         return roomMapper.findByBuildingId(buildingId);
     }
+
+
+    @Override
+    public List<Room> getRoomsByBuildingNames(List<String> buildingNames) {
+        if (buildingNames == null || buildingNames.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+        return roomMapper.findByBuildingNames(buildingNames);
+    }
 }
