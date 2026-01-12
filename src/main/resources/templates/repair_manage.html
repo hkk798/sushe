@@ -10,7 +10,7 @@
 
 <nav class="navbar navbar-dark bg-primary mb-4">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/dorm_admin_index"><i class="fas fa-chevron-left me-2"></i>返回工作台</a>
+        <a class="navbar-brand" href="/sys_admin_index"><i class="fas fa-chevron-left me-2"></i>返回工作台</a>
         <span class="text-white">报修管理</span>
     </div>
 </nav>
@@ -57,10 +57,10 @@
                     </thead>
                     <tbody>
                     <tr th:each="item : ${repairs}">
-                        <td th:text="${'REP' + item.order_id}">REP1001</td>
+                        <td th:text="${'REP' + item.orderId}">REP1001</td>
                         <td>
-                            <span class="badge bg-secondary" th:text="${item.building_no}">西9</span>
-                            <span class="fw-bold" th:text="${item.room_no} + '室'">101室</span>
+                            <span class="badge bg-secondary" th:text="${item.buildingNo}">西9</span>
+                            <span class="fw-bold" th:text="${item.roomNo} + '室'">101室</span>
                         </td>
                         <td>
                             <div class="fw-bold" th:text="${item.category}">电路故障</div>
@@ -69,12 +69,12 @@
                         </td>
                         <td>
                             <div th:text="${item.studentName}">张三</div>
-                            <div class="small text-muted" th:text="${item.student_no}">2023001</div>
+                            <div class="small text-muted" th:text="${item.studentNo}">2023001</div>
                         </td>
-                        <td th:text="${#temporals.format(item.submit_time, 'MM-dd HH:mm')}"></td>
+                        <td th:text="${#temporals.format(item.submitTime, 'MM-dd HH:mm')}"></td>
                         <td>
                             <a th:if="${item.status == 'pending'}"
-                               th:href="@{/dorm/repair/process/{id}(id=${item.order_id})}"
+                               th:href="@{/dorm/repair/process/{id}(id=${item.orderId})}"
                                class="btn btn-sm btn-primary"
                                onclick="return confirm('确认开始处理此报修单吗？')">
                                 <i class="fas fa-wrench me-1"></i>接单
@@ -84,13 +84,13 @@
                                     type="button"
                                     class="btn btn-sm btn-success"
                                     data-bs-toggle="modal"
-                                    th:data-bs-target="'#completeModal' + ${item.order_id}">
+                                    th:data-bs-target="'#completeModal' + ${item.orderId}">
                                 <i class="fas fa-check me-1"></i>完成
                             </button>
 
-                            <a th:href="@{/repair_detail(orderId=${item.order_id})}" class="btn btn-sm btn-outline-secondary">详情</a>
+                            <a th:href="@{/dorm/repair/detail(orderId=${item.orderId})}" class="btn btn-sm btn-outline-secondary">详情</a>
 
-                            <div class="modal fade" th:id="'completeModal' + ${item.order_id}" tabindex="-1">
+                            <div class="modal fade" th:id="'completeModal' + ${item.orderId}" tabindex="-1">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <form action="/dorm/repair/complete" method="post">
@@ -99,7 +99,7 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
                                             <div class="modal-body">
-                                                <input type="hidden" name="orderId" th:value="${item.order_id}">
+                                                <input type="hidden" name="orderId" th:value="${item.orderId}">
                                                 <div class="mb-3">
                                                     <label class="form-label">处理结果/备注</label>
                                                     <textarea name="remarks" class="form-control" rows="3" required placeholder="请填写维修结果..."></textarea>
