@@ -207,11 +207,15 @@ public interface RepairMapper {
             "ORDER BY ro.submit_time ASC" +
             "</script>")
     @Results({
-            @Result(property = "order_id", column = "order_id"), // 映射 Map 的 key
-            @Result(property = "room_no", column = "room_no"),
-            @Result(property = "building_no", column = "building_no"),
+            // 修改：property 改为驼峰格式
+            @Result(property = "orderId", column = "order_id"),
+            @Result(property = "roomNo", column = "room_no"),
+            @Result(property = "buildingNo", column = "building_no"),
+            @Result(property = "studentNo", column = "student_no"), // 增加学号映射
+            @Result(property = "submitTime", column = "submit_time"), // 增加时间映射
             @Result(property = "studentName", column = "studentName"),
-            // 其他需要的字段可以自动映射到 Map
+            @Result(property = "studentId", column = "student_id"),
+            @Result(property = "roomId", column = "room_id")
     })
     List<Map<String, Object>> findByBuildingNosAndStatus(@Param("buildingNos") List<String> buildingNos,
                                                          @Param("status") String status);
@@ -219,6 +223,7 @@ public interface RepairMapper {
     /**
      * [新增] 更新报修状态和处理人信息
      */
+    // 确保 updateStatus 方法也存在
     @Update("UPDATE RepairOrder SET status = #{status}, processor_id = #{adminId}, " +
             "process_time = NOW() " +
             "WHERE order_id = #{orderId}")
