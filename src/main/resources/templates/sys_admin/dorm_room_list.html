@@ -60,7 +60,9 @@
                         </td>
                         <td class="text-end pe-4">
                             <button type="button" class="btn btn-sm btn-outline-primary"
-                                    th:onclick="'viewStudents(' + ${room.roomId} + ', \'' + ${room.roomNo} + '\')'">
+                                    th:data-id="${room.roomId}"
+                                    th:data-no="${room.roomNo}"
+                                    onclick="viewStudents(this.getAttribute('data-id'), this.getAttribute('data-no'))">
                                 <i class="fas fa-users me-1"></i>查看成员
                             </button>
                         </td>

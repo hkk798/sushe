@@ -31,8 +31,8 @@
             <td th:text="${r.floor}">1</td>
             <td th:text="${r.roomNo}">101</td>
             <td>
-                <span th:if="${r.genderType == 'male'}" class="badge bg-primary">男寝</span>
-                <span th:if="${r.genderType == 'female'}" class="badge bg-danger">女寝</span>
+                <span th:if="${r.genderType == 'M'}" class="badge bg-primary">男寝</span>
+                <span th:if="${r.genderType == 'F'}" class="badge bg-danger">女寝</span>
             </td>
             <td>
                 <span th:text="${r.capacity - r.currentCount}" style="color: green; font-weight: bold;">4</span>

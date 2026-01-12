@@ -154,8 +154,12 @@ public class DormAdminController {
         // 1. 解析管辖楼栋
         List<String> buildingNos = Collections.emptyList();
         if (admin.getManageBuilding() != null && !admin.getManageBuilding().isEmpty()) {
-            String buildings = admin.getManageBuilding().replace("，", ",");
-            buildingNos = Arrays.asList(buildings.split(","));
+            // 替换中文逗号 -> 分割 -> 去除首尾空格
+            String[] split = admin.getManageBuilding().replace("，", ",").split(",");
+            buildingNos = Arrays.stream(split)
+                    .map(String::trim) // <--- 新增：去除空格，防止 " 西9" 查不到
+                    .filter(s -> !s.isEmpty())
+                    .toList();
         }
 
         // 2. 查询房间
@@ -166,7 +170,7 @@ public class DormAdminController {
 
         model.addAttribute("rooms", rooms);
         model.addAttribute("admin", admin);
-        return "sys_admin/dorm_room_list"; // 指向新页面
+        return "sys_admin/dorm_room_list";
     }
 
     /**

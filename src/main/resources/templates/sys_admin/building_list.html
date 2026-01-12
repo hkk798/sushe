@@ -34,8 +34,8 @@
             <td th:text="${b.buildingNo}">西9</td>
             <td th:text="${b.buildingName}">西区9号楼</td>
             <td>
-                <span th:if="${b.genderType == 'male'}" class="badge bg-primary">男寝</span>
-                <span th:if="${b.genderType == 'female'}" class="badge bg-danger">女寝</span>
+                <span th:if="${b.genderType == 'M'}" class="badge bg-primary">男寝</span>
+                <span th:if="${b.genderType == 'F'}" class="badge bg-danger">女寝</span>
             </td>
             <td th:text="${b.roomCount}">100</td>
             <td>

@@ -49,7 +49,7 @@ public interface RoomMapper {
             "SELECT r.*, b.building_name " +
             "FROM Room r " +
             "JOIN Building b ON r.building_id = b.building_id " +
-            "WHERE b.building_name IN " +
+            "WHERE b.building_no IN " +  // <--- 请将 building_name 修改为 building_no
             "<foreach item='name' collection='buildingNames' open='(' separator=',' close=')'>" +
             "#{name}" +
             "</foreach>" +
