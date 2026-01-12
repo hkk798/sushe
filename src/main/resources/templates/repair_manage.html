@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>报修处理 - 宿舍管理系统</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-primary mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/dorm_admin_index"><i class="fas fa-chevron-left me-2"></i>返回工作台</a>
+        <span class="text-white">报修管理</span>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <ul class="nav nav-pills nav-fill">
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${currentStatus == 'pending'} ? 'active'"
+                       href="/dorm/repair?status=pending">
+                        <i class="fas fa-clock me-1"></i>待处理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${currentStatus == 'processing'} ? 'active'"
+                       href="/dorm/repair?status=processing">
+                        <i class="fas fa-tools me-1"></i>处理中
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${currentStatus == 'completed'} ? 'active'"
+                       href="/dorm/repair?status=completed">
+                        <i class="fas fa-check-circle me-1"></i>已完成
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th>单号</th>
+                        <th>位置</th>
+                        <th>报修内容</th>
+                        <th>申请人</th>
+                        <th>提交时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="item : ${repairs}">
+                        <td th:text="${'REP' + item.order_id}">REP1001</td>
+                        <td>
+                            <span class="badge bg-secondary" th:text="${item.building_no}">西9</span>
+                            <span class="fw-bold" th:text="${item.room_no} + '室'">101室</span>
+                        </td>
+                        <td>
+                            <div class="fw-bold" th:text="${item.category}">电路故障</div>
+                            <div class="small text-muted text-truncate" style="max-width: 200px;"
+                                 th:text="${item.description}">描述...</div>
+                        </td>
+                        <td>
+                            <div th:text="${item.studentName}">张三</div>
+                            <div class="small text-muted" th:text="${item.student_no}">2023001</div>
+                        </td>
+                        <td th:text="${#temporals.format(item.submit_time, 'MM-dd HH:mm')}"></td>
+                        <td>
+                            <a th:if="${item.status == 'pending'}"
+                               th:href="@{/dorm/repair/process/{id}(id=${item.order_id})}"
+                               class="btn btn-sm btn-primary"
+                               onclick="return confirm('确认开始处理此报修单吗？')">
+                                <i class="fas fa-wrench me-1"></i>接单
+                            </a>
+
+                            <button th:if="${item.status == 'processing'}"
+                                    type="button"
+                                    class="btn btn-sm btn-success"
+                                    data-bs-toggle="modal"
+                                    th:data-bs-target="'#completeModal' + ${item.order_id}">
+                                <i class="fas fa-check me-1"></i>完成
+                            </button>
+
+                            <a th:href="@{/repair_detail(orderId=${item.order_id})}" class="btn btn-sm btn-outline-secondary">详情</a>
+
+                            <div class="modal fade" th:id="'completeModal' + ${item.order_id}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form action="/dorm/repair/complete" method="post">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">完成报修处理</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <input type="hidden" name="orderId" th:value="${item.order_id}">
+                                                <div class="mb-3">
+                                                    <label class="form-label">处理结果/备注</label>
+                                                    <textarea name="remarks" class="form-control" rows="3" required placeholder="请填写维修结果..."></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                                <button type="submit" class="btn btn-success">确认完成</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr th:if="${#lists.isEmpty(repairs)}">
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="fas fa-clipboard-check fa-3x mb-3"></i>
+                            <p>当前没有<span th:text="${currentStatus == 'pending' ? '待处理' : '相关'}"></span>的报修记录</p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -7,6 +7,7 @@ import org.example.mapper.StudentMapper;
 import org.example.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -129,6 +130,28 @@ public class StudentService {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+
+    @Transactional
+    public boolean updateContactInfo(Integer studentId, String phone, String email) {
+        try {
+            // 1. 根据studentId找到对应的用户ID
+            Integer userId = studentMapper.findUserIdByStudentId(studentId);
+            if (userId == null) {
+                return false;
+            }
+
+            // 2. 更新用户表中的电话和邮箱
+            int rowsAffected = userMapper.updateContactInfo(userId, phone, email);
+
+            return rowsAffected > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // 事务会自动回滚
+            return false;
         }
     }
 }

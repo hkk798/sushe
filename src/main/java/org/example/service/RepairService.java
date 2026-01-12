@@ -384,4 +384,14 @@ public class RepairService {
             return null;
         }
     }
+
+    public List<Map<String, Object>> findRepairsByBuildingNos(List<String> buildingNos, String status) {
+        return repairMapper.findByBuildingNosAndStatus(buildingNos, status);
+    }
+
+    public void updateRepairStatus(Integer orderId, String status, Integer adminId, String remarks) {
+        // 这里可以添加业务校验，比如检查当前状态是否允许流转
+        repairMapper.updateStatus(orderId, status, adminId);
+        // 如果有备注需求，建议在数据库表 RepairOrder 增加 remarks 字段并同步更新 Mapper
+    }
 }

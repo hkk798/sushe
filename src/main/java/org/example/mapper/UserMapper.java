@@ -240,4 +240,13 @@ public interface UserMapper {
                            @Param("studentNo") String studentNo, // [新增参数]
                            @Param("major") String major,
                            @Param("className") String className);
+
+
+    @Update("UPDATE User SET phone = #{phone}, email = #{email} WHERE user_id = #{userId}")
+    int updateContactInfo(@Param("userId") Integer userId,
+                          @Param("phone") String phone,
+                          @Param("email") String email);
+
+
 }
+
