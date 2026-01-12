@@ -43,7 +43,7 @@
         <ul class="pagination justify-content-center">
 
             <li class="page-item" th:classappend="${!pageInfo.hasPreviousPage} ? 'disabled'">
-                <a class="page-link" th:href="@{/admin/log/list(page=${pageInfo.prePage})}">上一页</a>
+                <a class="page-link" th:href="@{/admin/system_log(page=${pageInfo.prePage}, size=${pageInfo.pageSize})}">上一页</a>
             </li>
 
             <li class="page-item disabled">
@@ -51,7 +51,7 @@
             </li>
 
             <li class="page-item" th:classappend="${!pageInfo.hasNextPage} ? 'disabled'">
-                <a class="page-link" th:href="@{/admin/log/list(page=${pageInfo.nextPage})}">下一页</a>
+                <a class="page-link" th:href="@{/admin/system_log(page=${pageInfo.nextPage}, size=${pageInfo.pageSize})}">下一页</a>
             </li>
         </ul>
     </nav>
