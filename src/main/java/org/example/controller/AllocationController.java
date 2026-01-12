@@ -91,11 +91,21 @@ public class AllocationController {
     @PostMapping("/doChange")
     public String doChange(@RequestParam Integer studentId,
                            @RequestParam Integer roomId,
-                           HttpSession session) {
+                           HttpSession session,
+                           RedirectAttributes redirectAttributes) { // 1. 添加 RedirectAttributes 参数
         Integer adminId = 1; // 暂定为 1
-        allocationService.changeDorm(studentId, roomId, adminId);
+        try {
+            allocationService.changeDorm(studentId, roomId, adminId);
+            // 成功，重定向到房间列表
+            return "redirect:/admin/dorm/rooms";
+        } catch (RuntimeException e) {
+            // 2. 捕获 Service 抛出的异常（包括“相同房间”、“房间已满”等）
+            // 将错误信息放入 Flash 属性中，这样重定向后也能读取到
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
 
-        // 换寝成功后，建议返回到“我的楼栋房间列表”或者“首页”
-        return "redirect:/admin/dorm/rooms"; // 假设这是你的房间列表路径，如果不是请修改
+            // 3. 发生错误，重定向回“换寝室”页面，让用户重新选择
+            return "redirect:/admin/allocation/change?studentId=" + studentId;
+        }
+
     }
 }

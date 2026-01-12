@@ -36,5 +36,16 @@
         </div>
     </div>
 </div>
+
+
+<script th:inline="javascript" th:if="${errorMessage}">
+    var msg = [[${errorMessage}]];
+    alert(msg);
+</script>
+
+</body>
+</html>
+
+
 </body>
 </html>
