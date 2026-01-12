@@ -9,16 +9,14 @@ import java.util.List;
 @Mapper
 public interface AllocationRecordMapper {
 
-    // 1. 查询未分配的学生
-    // 逻辑：在 Student 表中，但不在 'active' 状态的 AllocationRecord 表中
+    // 查询未分配的学生
     @Select("SELECT s.*, u.real_name " +
             "FROM Student s " +
             "JOIN User u ON s.user_id = u.user_id " +
             "WHERE s.student_id NOT IN (SELECT student_id FROM AllocationRecord WHERE status = 'active')")
     List<Student> findUnallocatedStudents();
 
-    // 2. 根据性别查询可用房间
-    // 逻辑：status='available' 且 gender_type 符合
+    // 根据性别查询可用房间
     @Select("SELECT r.*, b.building_name " +
             "FROM Room r " +
             "JOIN Building b ON r.building_id = b.building_id " +
@@ -27,10 +25,14 @@ public interface AllocationRecordMapper {
             "ORDER BY b.building_name, r.room_no")
     List<Room> findAvailableRoomsByGender(String gender);
 
-    // 3. 插入分配记录
-    // 注意：您的SQL里定义了触发器，插入后数据库会自动更新 Room 的 current_count，我们不用管
+    // 插入分配记录
     @Insert("INSERT INTO AllocationRecord(student_id, room_id, admin_id, allocate_date, status, fee_status) " +
             "VALUES(#{studentId}, #{roomId}, #{adminId}, #{allocateDate}, 'active', 'unpaid')")
     @Options(useGeneratedKeys = true, keyProperty = "recordId")
     int insert(AllocationRecord record);
+
+    // ✅ [新增] 结束当前的入住记录（用于换寝室）
+    @Update("UPDATE AllocationRecord SET status = 'completed', check_out_date = NOW() " +
+            "WHERE student_id = #{studentId} AND status = 'active'")
+    int completeActiveRecord(Integer studentId);
 }

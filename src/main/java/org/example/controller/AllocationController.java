@@ -2,7 +2,6 @@ package org.example.controller;
 
 import org.example.entity.Room;
 import org.example.entity.Student;
-//import org.example.entity.User;
 import org.example.service.AllocationService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,6 @@ public class AllocationController {
     @Autowired
     private AllocationService allocationService;
 
-    // [新增] 注入 UserMapper (因为 UserMapper 中有根据学号查学生的方法)
     @Autowired
     private org.example.mapper.UserMapper userMapper;
 
@@ -45,35 +43,41 @@ public class AllocationController {
     public String doAssign(@RequestParam Integer studentId,
                            @RequestParam Integer roomId,
                            HttpSession session) {
-
-        // 尝试从 Session 获取当前登录的管理员信息
-        // (假设登录时存了 User 对象，且 User 对象关联了 Admin 表的 ID)
-        // ⚠️ 临时方案：如果 Session 里拿不到 adminId，我们先硬编码为 1，防止报错
-        Integer adminId = 1;
-
-        // User currentUser = (User) session.getAttribute("currentUser");
-        // if (currentUser != null) { ... 获取 adminId ... }
-
+        Integer adminId = 1; // 暂定为 1
         allocationService.assignDorm(studentId, roomId, adminId);
         return "redirect:/admin/allocation/list";
     }
 
-
     @GetMapping("/search")
     public String searchStudent(@RequestParam String studentNo,
                                 org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
-        // 1. 根据学号查找学生 (使用 UserMapper 中已有的方法)
         Student student = userMapper.findStudentByStudentNo(studentNo);
-
-        // 2. 如果找不到学生，提示错误并返回首页
         if (student == null) {
-            // 使用 RedirectAttributes 可以在重定向后携带错误信息
             redirectAttributes.addFlashAttribute("errorMessage", "未找到学号为 " + studentNo + " 的学生！");
             return "redirect:/dorm_admin_index";
         }
-
-        // 3. 找到学生，直接跳转到该学生的分配页面
-        // 复用已有的 /assign 接口
         return "redirect:/admin/allocation/assign?studentId=" + student.getStudentId();
+    }
+
+    // ✅ [新增] 4. 跳转到换寝室页面
+    @GetMapping("/change")
+    public String changePage(@RequestParam Integer studentId, Model model) {
+        // 复用获取可用房间的逻辑
+        List<Room> rooms = allocationService.getAvailableRooms(studentId);
+        model.addAttribute("studentId", studentId);
+        model.addAttribute("rooms", rooms);
+        return "sys_admin/allocation_change";
+    }
+
+    // ✅ [新增] 5. 执行换寝室
+    @PostMapping("/doChange")
+    public String doChange(@RequestParam Integer studentId,
+                           @RequestParam Integer roomId,
+                           HttpSession session) {
+        Integer adminId = 1; // 暂定为 1
+        allocationService.changeDorm(studentId, roomId, adminId);
+
+        // 换寝成功后，建议返回到“我的楼栋房间列表”或者“首页”
+        return "redirect:/dorm_admin/rooms"; // 假设这是你的房间列表路径，如果不是请修改
     }
 }

@@ -272,7 +272,7 @@
                     <span th:if="${dormInfo.room != null}">
                         <span th:text="${dormInfo.room.capacity}"></span>人间
                         <span th:if="${dormInfo.room.genderType != null}">
-                            (<span th:text="${dormInfo.room.genderType == 'male' ? '男' : '女'}"></span>)
+                            (<span th:text="${dormInfo.room.genderType == 'M' ? '男' : '女'}"></span>)
                         </span>
                     </span>
                     <span th:unless="${dormInfo.room != null}">

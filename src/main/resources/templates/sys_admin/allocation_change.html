@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>换寝室</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-light p-5">
+<div class="container" style="max-width: 500px; margin-top: 50px;">
+    <div class="card shadow">
+        <div class="card-header bg-warning text-white">
+            <h4 class="mb-0"><i class="fas fa-exchange-alt me-2"></i>调换寝室</h4>
+        </div>
+        <div class="card-body">
+            <form action="/admin/allocation/doChange" method="post">
+                <input type="hidden" name="studentId" th:value="${studentId}">
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">请选择新房间：</label>
+                    <select name="roomId" class="form-select" required>
+                        <option value="">-- 请选择空闲房间 --</option>
+                        <option th:each="r : ${rooms}"
+                                th:value="${r.roomId}"
+                                th:text="${r.buildingName + ' - ' + r.roomNo + ' (剩余床位: ' + (r.capacity - r.currentCount) + ')'}">
+                        </option>
+                    </select>
+                    <div class="form-text text-muted">仅显示符合学生性别的空闲房间</div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-warning text-white">确认调换</button>
+                    <a href="javascript:history.back()" class="btn btn-secondary">返回</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
