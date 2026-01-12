@@ -8,4 +8,6 @@ public interface BuildingService {
     Building getBuildingById(Integer id);
     void saveBuilding(Building building); // 新增或修改
     void deleteBuilding(Integer id);
+
+    Building getBuildingByNo(String buildingNo);
 }

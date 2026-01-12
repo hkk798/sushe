@@ -12,4 +12,6 @@ public interface RoomService {
     List<Room> getRoomsByBuildingId(Integer buildingId);
 
     List<Room> getRoomsByBuildingNames(List<String> buildingNames);
+
+    Room getRoomByBuildingIdAndRoomNo(Integer buildingId, String roomNo);
 }

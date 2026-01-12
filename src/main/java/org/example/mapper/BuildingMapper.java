@@ -34,4 +34,8 @@ public interface BuildingMapper {
 
     @Select("SELECT COUNT(*) FROM Building")
     int countAll();
+
+
+    @Select("SELECT * FROM Building WHERE building_no = #{buildingNo}")
+    Building findByBuildingNo(String buildingNo);
 }

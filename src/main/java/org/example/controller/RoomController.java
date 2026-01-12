@@ -72,19 +72,49 @@ public class RoomController {
 
     // 3. 保存
     @PostMapping("/save")
-    public String save(Room room, HttpSession session, HttpServletRequest request) {
+    public String save(Room room, HttpSession session, HttpServletRequest request, Model model) { // 👈 添加 Model 参数
+
+        // --- [新增] 重复性检查逻辑开始 ---
+        Room existingRoom = roomService.getRoomByBuildingIdAndRoomNo(room.getBuildingId(), room.getRoomNo());
+
+        if (existingRoom != null) {
+            // 如果是新增 (roomId为空) 且 查到了同名房间 -> 冲突
+            // 如果是编辑 (roomId不为空) 且 查到了同名房间，但ID不同 -> 冲突
+            if (room.getRoomId() == null || !existingRoom.getRoomId().equals(room.getRoomId())) {
+                model.addAttribute("errorMessage", "操作失败：该楼栋下已存在房间号 " + room.getRoomNo());
+                return "error/room_error"; // 👈 跳转到错误反馈页面
+            }
+        }
+        // --- [新增] 重复性检查逻辑结束 ---
+
+        if (room.getRoomId() != null) {
+            // 从数据库取出该房间的旧数据（主要是为了拿真实的 currentCount）
+            Room oldRoom = roomService.getRoomById(room.getRoomId());
+
+            if (oldRoom != null) {
+                // 如果 管理员填写的容量 < 实际入住人数
+                if (room.getCapacity() < oldRoom.getCurrentCount()) {
+                    model.addAttribute("errorMessage",
+                            "操作失败：容量不能小于当前入住人数！(当前已住: " + oldRoom.getCurrentCount() + "人)");
+                    return "error/room_error"; // 跳转到错误页面
+                }
+            }
+        }
+
+
+
         String actionType = (room.getRoomId() == null) ? "新增房间" : "编辑房间";
 
         roomService.saveRoom(room);
 
-        // [新增] 日志
+        // 日志记录
         User admin = (User) session.getAttribute("currentUser");
         String operator = (admin != null) ? admin.getUsername() : "Unknown";
 
         systemLogService.recordLog(
                 operator,
                 actionType,
-                "保存房间: " + room.getRoomNo(),// 建议拼接更多信息如楼栋ID
+                "保存房间: " + room.getRoomNo(),
                 request.getRemoteAddr()
         );
 

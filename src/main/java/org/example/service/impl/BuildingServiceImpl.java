@@ -41,4 +41,9 @@ public class BuildingServiceImpl implements BuildingService {
         // 实际项目中，这里应该先检查该楼栋下是否有学生或房间，如果有则不允许删除
         buildingMapper.deleteById(id);
     }
+
+    @Override
+    public Building getBuildingByNo(String buildingNo) {
+        return buildingMapper.findByBuildingNo(buildingNo);
+    }
 }

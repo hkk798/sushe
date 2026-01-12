@@ -9,8 +9,9 @@
 <div class="container" style="max-width: 600px;">
     <h3 class="mb-4" th:text="${room.roomId == null ? '➕ 新增房间' : '✏️ 编辑房间'}">编辑房间</h3>
 
-    <form action="/admin/room/save" method="post">
-        <input type="hidden" name="roomId" th:value="${room.roomId}">
+    <form action="/admin/room/save" method="post" id="roomForm"> <input type="hidden" name="roomId" th:value="${room.roomId}">
+
+        <input type="hidden" id="currentCount" th:value="${room.currentCount != null ? room.currentCount : 0}">
 
         <div class="mb-3">
             <label class="form-label">所属楼栋</label>
@@ -37,7 +38,10 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">床位容量</label>
-                <input type="number" name="capacity" class="form-control" th:value="${room.capacity}" required>
+                <input type="number" id="capacityInput" name="capacity" class="form-control" th:value="${room.capacity}" required>
+                <div class="form-text text-muted" th:if="${room.roomId != null}">
+                    当前已住：<span class="text-primary fw-bold" th:text="${room.currentCount}">0</span> 人
+                </div>
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">住宿费 (元/年)</label>
@@ -65,5 +69,23 @@
         <a href="/admin/room/list" class="btn btn-link w-100 mt-2">返回列表</a>
     </form>
 </div>
+
+<script>
+    document.getElementById('roomForm').addEventListener('submit', function(event) {
+        var capacityInput = document.getElementById('capacityInput');
+        var currentCountInput = document.getElementById('currentCount');
+
+        var newCapacity = parseInt(capacityInput.value);
+        var currentCount = parseInt(currentCountInput.value);
+
+        // 如果新设置的容量 < 当前入住人数，阻止提交并弹窗
+        if (newCapacity < currentCount) {
+            event.preventDefault(); // 阻止表单提交
+            alert('⚠️ 操作无效！\n\n新设置的容量 (' + newCapacity + ') 不能小于当前已入住人数 (' + currentCount + ')。\n请先办理学生退宿，或调大容量。');
+            capacityInput.focus(); // 光标移回输入框
+        }
+    });
+</script>
+
 </body>
 </html>

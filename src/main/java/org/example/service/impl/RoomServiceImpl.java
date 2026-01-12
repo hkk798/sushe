@@ -54,4 +54,10 @@ public class RoomServiceImpl implements RoomService {
         }
         return roomMapper.findByBuildingNames(buildingNames);
     }
+
+
+    @Override
+    public Room getRoomByBuildingIdAndRoomNo(Integer buildingId, String roomNo) {
+        return roomMapper.findByBuildingIdAndRoomNo(buildingId, roomNo);
+    }
 }

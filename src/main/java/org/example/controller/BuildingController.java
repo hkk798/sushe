@@ -48,7 +48,21 @@ public class BuildingController {
     @PostMapping("/save")
     public String save(Building building,
                        HttpSession session,
-                       HttpServletRequest request) {
+                       HttpServletRequest request,
+                       Model model) { // 2. 方法参数增加 Model
+
+        // --- [新增] 查重逻辑开始 ---
+        Building existing = buildingService.getBuildingByNo(building.getBuildingNo());
+
+        if (existing != null) {
+            // 如果是新增 (Id为空) 且 查到了同号楼栋 -> 冲突
+            // 如果是编辑 (Id不为空) 且 查到了同号楼栋，但该楼栋ID不是当前正在编辑的这个 -> 冲突
+            if (building.getBuildingId() == null || !existing.getBuildingId().equals(building.getBuildingId())) {
+                model.addAttribute("errorMessage", "操作失败：楼栋编号 " + building.getBuildingNo() + " 已存在，请勿重复添加！");
+                return "error/building_error"; // 跳转到楼栋错误页面
+            }
+        }
+        // --- [新增] 查重逻辑结束 ---
 
         String actionType = (building.getBuildingId() == null) ? "新增楼栋" : "编辑楼栋";
 
@@ -57,7 +71,6 @@ public class BuildingController {
         User admin = (User) session.getAttribute("currentUser");
         String operator = (admin != null) ? admin.getUsername() : "未知用户";
 
-        // [新增] 记录日志
         systemLogService.recordLog(
                 operator,
                 actionType,

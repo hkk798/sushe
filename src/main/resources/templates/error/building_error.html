@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>操作失败</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body { background-color: #f8f9fa; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .error-card { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; max-width: 500px; width: 100%; }
+        .icon-box { font-size: 60px; color: #dc3545; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="error-card">
+    <div class="icon-box">
+        🏢🚫
+    </div>
+    <h3 class="text-danger mb-3">楼栋信息冲突</h3>
+
+    <p class="lead text-secondary" th:text="${errorMessage}">未知错误</p>
+
+    <div class="mt-4">
+        <button onclick="history.back()" class="btn btn-warning w-100">返回修改</button>
+
+        <a href="/admin/building/list" class="btn btn-link mt-2">放弃并返回列表</a>
+    </div>
+</div>
+
+</body>
+</html>

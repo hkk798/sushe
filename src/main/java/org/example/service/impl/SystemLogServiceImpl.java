@@ -1,5 +1,7 @@
 package org.example.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.example.entity.SystemLog;
 import org.example.mapper.SystemLogMapper;
 import org.example.service.SystemLogService;
@@ -25,5 +27,17 @@ public class SystemLogServiceImpl implements SystemLogService {
         SystemLog log = new SystemLog(operator, action, detail, ip);
         log.setCreateTime(LocalDateTime.now());
         systemLogMapper.insert(log);
+    }
+    @Override
+    public PageInfo<SystemLog> getAllLogs(Integer page, Integer size) {
+        // 1. 开启分页
+        PageHelper.startPage(page, size);
+
+        // 2. 查询所有
+        // 🔴 修正点 1：您 Mapper 中的方法名是 selectAll
+        List<SystemLog> logs = systemLogMapper.selectAll();
+
+        // 3. 封装返回
+        return new PageInfo<>(logs);
     }
 }

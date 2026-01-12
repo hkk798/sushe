@@ -56,4 +56,8 @@ public interface RoomMapper {
             "ORDER BY b.building_name, r.room_no" +
             "</script>")
     List<Room> findByBuildingNames(@Param("buildingNames") List<String> buildingNames);
+
+
+    @Select("SELECT * FROM Room WHERE building_id = #{buildingId} AND room_no = #{roomNo}")
+    Room findByBuildingIdAndRoomNo(@Param("buildingId") Integer buildingId, @Param("roomNo") String roomNo);
 }
