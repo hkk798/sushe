@@ -20,6 +20,11 @@
                 adminFields.style.display = "block";
             }
         }
+
+        // ✅ 页面加载完成后自动根据当前选中的角色设置显示状态
+        window.addEventListener('DOMContentLoaded', (event) => {
+            toggleFields();
+        });
     </script>
 </head>
 <body class="bg-light">
@@ -34,11 +39,12 @@
                     <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
                     <form action="/admin/user/add" method="post">
+
                         <h5 class="mb-3 text-secondary border-bottom pb-2">基本账号信息</h5>
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">用户名 (登录账号) *</label>
-                                <input type="text" name="username" class="form-control" required>
+                                <input type="text" name="username" class="form-control" th:value="${username}" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">密码 *</label>
@@ -46,68 +52,67 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">真实姓名 *</label>
-                                <input type="text" name="realName" class="form-control" required>
+                                <input type="text" name="realName" class="form-control" th:value="${realName}" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">用户角色 *</label>
                                 <select name="role" id="roleSelect" class="form-select" onchange="toggleFields()" required>
-                                    <option value="student">学生</option>
-                                    <option value="building_admin">宿舍管理员</option>
-                                    <option value="system_admin">系统管理员</option>
+                                    <option value="student" th:selected="${role == 'student'}">学生</option>
+                                    <option value="building_admin" th:selected="${role == 'building_admin'}">宿舍管理员</option>
+                                    <option value="system_admin" th:selected="${role == 'system_admin'}">系统管理员</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">联系电话</label>
-                                <input type="text" name="phone" class="form-control">
+                                <input type="text" name="phone" class="form-control" th:value="${phone}">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">电子邮箱</label>
-                                <input type="email" name="email" class="form-control">
+                                <input type="email" name="email" class="form-control" th:value="${email}">
+                            </div>
+                        </div> <div id="studentFields">
+                        <h5 class="mb-3 text-secondary border-bottom pb-2">学生详细信息</h5>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">学号 *</label>
+                                <input type="text" name="studentNo" class="form-control" th:value="${studentNo}">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">性别 *</label>
+                                <select name="gender" class="form-select">
+                                    <option value="M" th:selected="${gender == 'M'}">男</option>
+                                    <option value="F" th:selected="${gender == 'F'}">女</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">专业</label>
+                                <input type="text" name="major" class="form-control" th:value="${major}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">班级</label>
+                                <input type="text" name="className" class="form-control" th:value="${className}">
                             </div>
                         </div>
-
-                        <div id="studentFields">
-                            <h5 class="mb-3 text-secondary border-bottom pb-2">学生详细信息</h5>
-                            <div class="row g-3 mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">学号 *</label>
-                                    <input type="text" name="studentNo" class="form-control">
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label">性别 *</label>
-                                    <select name="gender" class="form-select">
-                                        <option value="M">男</option>
-                                        <option value="F">女</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label">专业</label>
-                                    <input type="text" name="major" class="form-control">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">班级</label>
-                                    <input type="text" name="className" class="form-control">
-                                </div>
-                            </div>
-                        </div>
+                    </div>
 
                         <div id="adminFields" style="display: none;">
                             <h5 class="mb-3 text-secondary border-bottom pb-2">管理员详细信息</h5>
                             <div class="row g-3 mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">工号 *</label>
-                                    <input type="text" name="adminNo" class="form-control">
+                                    <input type="text" name="adminNo" class="form-control" th:value="${adminNo}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">职位</label>
-                                    <input type="text" name="position" class="form-control">
+                                    <input type="text" name="position" class="form-control" th:value="${position}">
                                 </div>
                                 <div class="col-md-12">
                                     <label class="form-label">管理楼栋 (仅宿管需要填写)</label>
-                                    <input type="text" name="manageBuilding" class="form-control" placeholder="请输入楼栋号，多个楼栋请用中文或英文逗号分隔，如：西9,东3">
-                                    <div class="form-text">请填写楼栋编号或名称，用于给宿管分配权限。</div>
+                                    <input type="text" name="manageBuilding" class="form-control"
+                                           placeholder="请输入楼栋号..." th:value="${manageBuilding}">
+                                    <div class="form-text">请填写楼栋编号或名称...</div>
                                 </div>
                             </div>
                         </div>
@@ -122,5 +127,13 @@
         </div>
     </div>
 </div>
+
+<script th:inline="javascript" th:if="${errorMessage}">
+    // 获取后端传来的错误信息
+    var msg = [[${errorMessage}]];
+    // 弹出提示框
+    alert(msg);
+</script>
+
 </body>
 </html>

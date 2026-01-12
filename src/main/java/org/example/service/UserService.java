@@ -127,6 +127,14 @@ public class UserService {
         }
 
         // ！！！注意：下面不要用 try-catch 包裹，直接写逻辑！！！
+        // ✅ [新增] 检查学号是否已存在 (防止数据库报错)
+        if ("student".equals(user.getRole()) && student != null) {
+            Student existingStudent = userMapper.findStudentByStudentNo(student.getStudentNo());
+            if (existingStudent != null) {
+                throw new RuntimeException("学号 " + student.getStudentNo() + " 已存在，无法重复添加！");
+            }
+        }
+
 
         // 1. 保存用户基本信息
         int result = userMapper.save(user);

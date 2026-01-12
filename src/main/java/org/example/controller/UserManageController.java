@@ -62,6 +62,26 @@ public class UserManageController {
                           @RequestParam(required = false) String manageBuilding,
                           Model model, HttpSession session) {
 
+
+        // ✅ [新增] 1. 先把所有参数回填到 Model 中 (用于失败回显)
+        // 密码通常出于安全考虑不回显，如果非要回显也可以加上
+        model.addAttribute("username", username);
+        model.addAttribute("realName", realName);
+        model.addAttribute("role", role);
+        model.addAttribute("email", email);
+        model.addAttribute("phone", phone);
+
+        // 学生字段
+        model.addAttribute("studentNo", studentNo);
+        model.addAttribute("major", major);
+        model.addAttribute("className", className);
+        model.addAttribute("gender", gender);
+
+        // 管理员字段
+        model.addAttribute("adminNo", adminNo);
+        model.addAttribute("position", position);
+        model.addAttribute("manageBuilding", manageBuilding);
+
         // 1. 权限校验
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null || !"system_admin".equals(currentUser.getRole())) {
@@ -140,7 +160,9 @@ public class UserManageController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            model.addAttribute("errorMessage", "系统错误: " + e.getMessage());
+            // ✅ [修改] 直接使用异常消息，这样前端弹窗就是 "学号 xxx 已存在..."
+            // 原来是: model.addAttribute("errorMessage", "系统错误: " + e.getMessage());
+            model.addAttribute("errorMessage", e.getMessage());
             return "sys_admin/user_form";
         }
     }

@@ -69,7 +69,7 @@ public class AllocationController {
         if (hasDorm) {
             // 如果已分配，添加错误消息并跳回首页，不再进入分配页面
             redirectAttributes.addFlashAttribute("errorMessage",
-                    "操作拦截：学生 " + student.getRealName() + " (" + studentNo + ") 已经分配过宿舍了！");
+                    "操作拦截：学生 " + student.getUser().getRealName() + " (" + studentNo + ") 已经分配过宿舍了！");
             return "redirect:/dorm_admin_index";
         }
 
