@@ -419,4 +419,25 @@ public class UserService {
         return "导入完成！成功: " + successCount + " 条, 失败: " + failCount + " 条。 " + (failCount > 0 ? "详情: " + failReason.toString() : "");
     }
 
+
+
+
+    public String findRealUsername(String inputId, String email, String role) {
+        if ("student".equals(role)) {
+            // 1. 如果是学生，按学号查
+            Student s = userMapper.findStudentByStudentNo(inputId);
+            // 验证学生存在，且关联了User，且邮箱匹配
+            if (s != null && s.getUser() != null && email.equals(s.getUser().getEmail())) {
+                return s.getUser().getUsername(); // ✅ 返回真正的用户名 (比如 xiaoming)
+            }
+        } else if ("building_admin".equals(role) || "system_admin".equals(role)) {
+            // 2. 如果是管理员，按工号查
+            Admin a = userMapper.findAdminByAdminNo(inputId);
+            if (a != null && a.getUser() != null && email.equals(a.getUser().getEmail())) {
+                return a.getUser().getUsername(); // ✅ 返回真正的用户名
+            }
+        }
+        // 3. 没找到或邮箱不对
+        return null;
+    }
 }

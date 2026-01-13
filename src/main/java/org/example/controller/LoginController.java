@@ -192,43 +192,48 @@ public class LoginController {
     }
 
     @PostMapping("/forgot_password/verify")
-    public String verifyIdentity(@RequestParam String username,
-                                @RequestParam String email,
-                                @RequestParam String role,
-                                @RequestParam String captcha,
-                                HttpServletRequest request,
-                                Model model) {
-        
-        // 验证验证码
+    public String verifyIdentity(@RequestParam String username, // 前端传来的可能是学号
+                                 @RequestParam String email,
+                                 @RequestParam String role,
+                                 @RequestParam String captcha,
+                                 HttpServletRequest request,
+                                 Model model) {
+
+        // 1. 验证图片验证码 (保持原样)
         HttpSession session = request.getSession();
         String sessionCaptcha = (String) session.getAttribute("captcha");
-        
         if (sessionCaptcha == null || !sessionCaptcha.equalsIgnoreCase(captcha)) {
             model.addAttribute("step", 1);
             model.addAttribute("errorMessage", "验证码错误");
             return "login/forgot_password";
         }
-        
-        // 验证用户信息（这里简化处理）
-        // 实际应该查询数据库验证用户名、邮箱和角色是否匹配
-        
-        // 生成验证码并发送邮件（模拟）
+
+        // 2. ✅【关键修改】调用 Service 查找真正的用户名
+        String realUsername = userService.findRealUsername(username, email, role);
+
+        if (realUsername == null) {
+            // 说明账号不存在，或者邮箱和账号不匹配
+            model.addAttribute("step", 1);
+            model.addAttribute("errorMessage", "账号不存在或邮箱不匹配");
+            return "login/forgot_password";
+        }
+
+        // 3. 生成 Token (保持原样)
         String verificationCode = generateVerificationCode();
         String token = generateToken();
-        
-        // 存储验证码和token（模拟发送邮件）
+
+        // 4. ✅【关键修改】存储查出来的 realUsername，而不是用户输入的 username
         verificationCodes.put(token, verificationCode);
-        resetTokens.put(token, username);
-        
-        // 这里模拟发送邮件
+        resetTokens.put(token, realUsername); // <--- 存入真正的用户名(xiaoming)
+
+        // 5. 模拟发送邮件 (保持原样)
         System.out.println("验证码: " + verificationCode + " (已发送到: " + email + ")");
         System.out.println("Token: " + token);
-        
-        // 设置模型属性
+
         model.addAttribute("step", 2);
         model.addAttribute("token", token);
-        model.addAttribute("successMessage", "验证码已发送到您的邮箱，请查收");
-        
+        model.addAttribute("successMessage", "验证码已发送到您的邮箱");
+
         return "login/forgot_password";
     }
     
@@ -276,7 +281,7 @@ public class LoginController {
         
         try {
             // 这里应该调用UserService更新密码
-            // userService.updatePassword(username, newPassword);
+            userService.resetPassword(username, newPassword);
             System.out.println("为用户 " + username + " 重置密码为: " + newPassword);
             
             // 清理验证数据

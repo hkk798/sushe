@@ -40,8 +40,8 @@
                         <td class="fw-bold" th:text="${room.roomNo}">101</td>
                         <td th:text="${room.floor}">1</td>
                         <td>
-                            <span th:if="${room.genderType == 'male'}" class="badge bg-primary bg-opacity-10 text-primary">男寝</span>
-                            <span th:if="${room.genderType == 'female'}" class="badge bg-danger bg-opacity-10 text-danger">女寝</span>
+                            <span th:if="${room.genderType == 'M'}" class="badge bg-primary bg-opacity-10 text-primary">男寝</span>
+                            <span th:if="${room.genderType == 'F'}" class="badge bg-danger bg-opacity-10 text-danger">女寝</span>
                         </td>
                         <td>
                             <div class="d-flex align-items-center">
